@@ -1,0 +1,2146 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Gesture Synth</title>
+
+<style>
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+button {
+    font-family: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* =====================================================
+   HOME
+===================================================== */
+
+#home {
+    min-height: 100vh;
+}
+
+
+/* NAV */
+
+nav {
+    height: 90px;
+    padding: 0 5vw;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #222;
+}
+
+.logo {
+    font-size: 12px;
+    line-height: 1.05;
+    letter-spacing: 3px;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    gap: 35px;
+    align-items: center;
+}
+
+.nav-links span {
+    color: #777;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.nav-play {
+    color: white !important;
+    border: 1px solid #444;
+    padding: 12px 18px;
+}
+
+
+/* HERO */
+
+.hero {
+    min-height: calc(100vh - 90px);
+
+    padding: 8vw 5vw;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom: 1px solid #222;
+}
+
+.hero-number {
+    position: absolute;
+    top: 35px;
+    left: 5vw;
+
+    color: #555;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 5;
+}
+
+.eyebrow {
+    color: #666;
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 25px;
+}
+
+.hero h1 {
+    font-size: clamp(60px, 10vw, 145px);
+    line-height: .82;
+    letter-spacing: -7px;
+    font-weight: 600;
+}
+
+.hero h1 span {
+    color: #666;
+}
+
+.hero-description {
+    margin-top: 45px;
+
+    max-width: 370px;
+
+    color: #888;
+
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.enter {
+    margin-top: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 40px;
+
+    padding: 17px 22px;
+
+    border: 1px solid #555;
+
+    background: transparent;
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 10px;
+    letter-spacing: 3px;
+
+    transition: .25s;
+}
+
+.enter:hover {
+    background: white;
+    color: black;
+}
+
+.enter span {
+    font-size: 18px;
+}
+
+
+/* ABSTRACT ART */
+
+.hero-art {
+    position: absolute;
+
+    right: 7vw;
+
+    width: 420px;
+    height: 520px;
+}
+
+.circle {
+    position: absolute;
+
+    border: 1px solid #2c2c2c;
+
+    border-radius: 50%;
+}
+
+.c1 {
+    width: 420px;
+    height: 420px;
+
+    top: 50px;
+}
+
+.c2 {
+    width: 300px;
+    height: 300px;
+
+    top: 110px;
+    left: 60px;
+}
+
+.c3 {
+    width: 130px;
+    height: 130px;
+
+    top: 195px;
+    left: 145px;
+}
+
+.line {
+    position: absolute;
+
+    width: 1px;
+
+    background: white;
+
+    transform-origin: bottom;
+}
+
+.l1 {
+    height: 170px;
+    left: 205px;
+    top: 40px;
+    transform: rotate(-32deg);
+}
+
+.l2 {
+    height: 215px;
+    left: 230px;
+    top: 35px;
+    transform: rotate(-13deg);
+}
+
+.l3 {
+    height: 235px;
+    left: 255px;
+    top: 35px;
+}
+
+.l4 {
+    height: 205px;
+    left: 280px;
+    top: 45px;
+    transform: rotate(13deg);
+}
+
+.l5 {
+    height: 160px;
+    left: 305px;
+    top: 75px;
+    transform: rotate(30deg);
+}
+
+.art-label {
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    color: #555;
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+
+/* ABOUT */
+
+.about {
+    min-height: 550px;
+
+    padding: 100px 5vw;
+
+    display: grid;
+    grid-template-columns: 100px 1fr;
+
+    border-bottom: 1px solid #222;
+}
+
+.section-number {
+    color: #555;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.about h2 {
+    font-size: clamp(45px, 7vw, 100px);
+    line-height: .88;
+    letter-spacing: -5px;
+    font-weight: 500;
+}
+
+.about p {
+    margin-top: 45px;
+
+    max-width: 450px;
+
+    color: #777;
+
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+
+/* HOW */
+
+.how {
+    min-height: 500px;
+
+    padding: 100px 5vw;
+
+    display: grid;
+    grid-template-columns: 100px 1fr;
+
+    border-bottom: 1px solid #222;
+}
+
+.steps {
+    margin-top: 60px;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+.step {
+    min-height: 230px;
+
+    border-top: 1px solid #333;
+
+    padding-top: 20px;
+}
+
+.step-number {
+    color: #555;
+    font-size: 10px;
+}
+
+.step h3 {
+    margin-top: 60px;
+
+    font-size: 13px;
+    letter-spacing: 2px;
+    font-weight: 400;
+}
+
+.step p {
+    margin-top: 18px;
+
+    max-width: 230px;
+
+    color: #666;
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* FINAL */
+
+.final {
+    min-height: 650px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+}
+
+.final-small {
+    color: #555;
+
+    font-size: 10px;
+    letter-spacing: 4px;
+
+    margin-bottom: 35px;
+}
+
+.final h2 {
+    font-size: clamp(55px, 9vw, 130px);
+    line-height: .82;
+    letter-spacing: -6px;
+    font-weight: 500;
+}
+
+.final button {
+    margin-top: 55px;
+
+    padding: 18px 25px;
+
+    border: 1px solid #555;
+
+    background: transparent;
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 10px;
+    letter-spacing: 3px;
+}
+
+.final button:hover {
+    background: white;
+    color: black;
+}
+
+
+/* FOOTER */
+
+footer {
+    height: 70px;
+
+    padding: 0 5vw;
+
+    border-top: 1px solid #222;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #444;
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+
+/* =====================================================
+   SYNTH
+===================================================== */
+
+#synth {
+    display: none;
+
+    min-height: 100vh;
+
+    padding: 25px 4vw;
+}
+
+
+/* SYNTH NAV */
+
+.synth-nav {
+    height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #222;
+}
+
+.back {
+    border: 0;
+
+    background: transparent;
+    color: #777;
+
+    cursor: pointer;
+
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.back:hover {
+    color: white;
+}
+
+.synth-title {
+    font-size: 12px;
+    letter-spacing: 4px;
+}
+
+.live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #777;
+
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #444;
+}
+
+
+/* CAMERA */
+
+.camera-wrap {
+    margin-top: 25px;
+
+    position: relative;
+
+    width: 100%;
+
+    background: #090909;
+
+    border: 1px solid #292929;
+
+    overflow: hidden;
+
+    aspect-ratio: 16 / 8.5;
+}
+
+#video {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transform: scaleX(-1);
+
+    background: #111;
+}
+
+#canvas {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transform: scaleX(-1);
+
+    pointer-events: none;
+}
+
+
+/* CAMERA UI */
+
+.camera-ui {
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+}
+
+.hand-display {
+    position: absolute;
+
+    top: 25px;
+}
+
+.left-display {
+    left: 25px;
+}
+
+.right-display {
+    right: 25px;
+
+    text-align: right;
+}
+
+.hand-display label {
+    display: block;
+
+    color: #777;
+
+    font-size: 9px;
+    letter-spacing: 3px;
+}
+
+.hand-display strong {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 40px;
+    font-weight: 400;
+}
+
+.hand-display small {
+    color: #555;
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+
+/* INSTRUCTIONS */
+
+.instructions {
+    position: absolute;
+
+    bottom: 20px;
+    left: 25px;
+
+    color: #666;
+
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+
+/* MAPPINGS */
+
+.mapping-area {
+    margin-top: 20px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 20px;
+}
+
+.mapping-card {
+    padding: 20px;
+
+    background: #090909;
+
+    border: 1px solid #222;
+}
+
+.mapping-title {
+    color: #777;
+
+    font-size: 9px;
+
+    letter-spacing: 3px;
+}
+
+.keys {
+    display: grid;
+
+    grid-template-columns: repeat(5, 1fr);
+
+    gap: 7px;
+
+    margin-top: 15px;
+}
+
+.keys.chords {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.key {
+    height: 55px;
+
+    border: 1px solid #292929;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 4px;
+
+    transition: .1s;
+}
+
+.key-number {
+    color: #555;
+
+    font-size: 8px;
+}
+
+.key-name {
+    font-size: 14px;
+}
+
+.key.active {
+    background: white;
+    color: black;
+}
+
+.key.active .key-number {
+    color: #555;
+}
+
+
+/* START */
+
+#startSynth {
+    display: block;
+
+    margin: 25px auto;
+
+    padding: 15px 25px;
+
+    border: 1px solid #444;
+
+    background: white;
+    color: black;
+
+    cursor: pointer;
+
+    font-size: 10px;
+    letter-spacing: 3px;
+}
+
+#startSynth:hover {
+    background: #ddd;
+}
+
+#startSynth:disabled {
+    opacity: .4;
+}
+
+
+/* RESPONSIVE */
+
+@media(max-width:900px) {
+
+    .hero-art {
+        right: -140px;
+        opacity: .25;
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media(max-width:600px) {
+
+    nav {
+        padding: 0 20px;
+    }
+
+    .nav-links span:not(.nav-play) {
+        display: none;
+    }
+
+    .hero {
+        padding: 100px 20px;
+    }
+
+    .hero h1 {
+        letter-spacing: -3px;
+    }
+
+    .hero-art {
+        right: -230px;
+    }
+
+    .about,
+    .how {
+        padding: 80px 20px;
+
+        grid-template-columns: 1fr;
+
+        gap: 40px;
+    }
+
+    .mapping-area {
+        grid-template-columns: 1fr;
+    }
+
+    .keys.chords {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    footer {
+        padding: 0 20px;
+    }
+
+    footer span:nth-child(2) {
+        display: none;
+    }
+
+}
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HOME
+===================================================== -->
+
+<div id="home">
+
+    <nav>
+
+        <div class="logo">
+            GESTURE<br>SYNTH
+        </div>
+
+        <div class="nav-links">
+
+            <span>ABOUT</span>
+
+            <span>HOW IT WORKS</span>
+
+            <span class="nav-play">PLAY ↗</span>
+
+        </div>
+
+    </nav>
+
+
+    <section class="hero">
+
+        <div class="hero-number">
+            01
+        </div>
+
+        <div class="hero-content">
+
+            <div class="eyebrow">
+                A WEBCAM-BASED MUSICAL INSTRUMENT
+            </div>
+
+            <h1>
+                PLAY MUSIC<br>
+                <span>WITH YOUR</span><br>
+                HANDS.
+            </h1>
+
+            <p class="hero-description">
+                Turn your hands into an instrument.
+                Shape melodies with one hand,
+                chords with the other.
+            </p>
+
+            <button class="enter" id="enterSynth">
+                ENTER SYNTH
+                <span>→</span>
+            </button>
+
+        </div>
+
+
+        <div class="hero-art">
+
+            <div class="circle c1"></div>
+            <div class="circle c2"></div>
+            <div class="circle c3"></div>
+
+            <div class="line l1"></div>
+            <div class="line l2"></div>
+            <div class="line l3"></div>
+            <div class="line l4"></div>
+            <div class="line l5"></div>
+
+            <div class="art-label">
+                <span>GESTURE</span>
+                <span>01 — 05</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="about">
+
+        <div class="section-number">
+            02
+        </div>
+
+        <div>
+
+            <div class="eyebrow">
+                THE IDEA
+            </div>
+
+            <h2>
+                WHAT IF YOUR<br>
+                HANDS WERE<br>
+                THE INSTRUMENT?
+            </h2>
+
+            <p>
+                Gesture Synth transforms movement into
+                music. Your webcam tracks your hands
+                in real time and translates simple
+                gestures into notes and chords.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="how">
+
+        <div class="section-number">
+            03
+        </div>
+
+        <div>
+
+            <div class="eyebrow">
+                HOW IT WORKS
+            </div>
+
+            <div class="steps">
+
+                <div class="step">
+
+                    <div class="step-number">01</div>
+
+                    <h3>
+                        SHOW YOUR HANDS
+                    </h3>
+
+                    <p>
+                        Your webcam detects the
+                        position of your fingers.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">02</div>
+
+                    <h3>
+                        MAKE A GESTURE
+                    </h3>
+
+                    <p>
+                        Finger combinations become
+                        musical notes and chords.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">03</div>
+
+                    <h3>
+                        MAKE MUSIC
+                    </h3>
+
+                    <p>
+                        Combine melody and harmony
+                        using both hands.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="final">
+
+        <div class="final-small">
+            READY?
+        </div>
+
+        <h2>
+            YOUR HANDS<br>
+            ARE THE<br>
+            INSTRUMENT.
+        </h2>
+
+        <button id="finalStart">
+            START PLAYING ↗
+        </button>
+
+    </section>
+
+
+    <footer>
+
+        <span>GESTURE SYNTH</span>
+
+        <span>HAND TRACKING × WEB AUDIO</span>
+
+        <span>2026</span>
+
+    </footer>
+
+</div>
+
+
+
+<!-- =====================================================
+     SYNTH
+===================================================== -->
+
+<div id="synth">
+
+    <div class="synth-nav">
+
+        <button class="back" id="backHome">
+            ← BACK
+        </button>
+
+        <div class="synth-title">
+            GESTURE SYNTH
+        </div>
+
+        <div class="live">
+            <div class="live-dot" id="liveDot"></div>
+            <span id="liveText">OFFLINE</span>
+        </div>
+
+    </div>
+
+
+    <div class="camera-wrap">
+
+        <video
+            id="video"
+            autoplay
+            playsinline
+            muted>
+        </video>
+
+        <canvas id="canvas"></canvas>
+
+
+        <div class="camera-ui">
+
+            <div class="hand-display left-display">
+
+                <label>LEFT HAND</label>
+
+                <strong id="leftNote">—</strong>
+
+                <small>MELODY</small>
+
+            </div>
+
+
+            <div class="hand-display right-display">
+
+                <label>RIGHT HAND</label>
+
+                <strong id="rightChord">—</strong>
+
+                <small>CHORD</small>
+
+            </div>
+
+
+            <div class="instructions">
+                LEFT = MELODY &nbsp;&nbsp; / &nbsp;&nbsp;
+                RIGHT = CHORD
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="mapping-area">
+
+
+        <div class="mapping-card">
+
+            <div class="mapping-title">
+                LEFT HAND / MELODY
+            </div>
+
+            <div class="keys">
+
+                <div class="key">
+                    <span class="key-number">1 FINGER</span>
+                    <span class="key-name">C</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">2 FINGERS</span>
+                    <span class="key-name">D</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">3 FINGERS</span>
+                    <span class="key-name">E</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">4 FINGERS</span>
+                    <span class="key-name">F</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">5 FINGERS</span>
+                    <span class="key-name">G</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="mapping-card">
+
+            <div class="mapping-title">
+                RIGHT HAND / CHORD
+            </div>
+
+            <div class="keys chords">
+
+                <div class="key">
+                    <span class="key-number">FIST</span>
+                    <span class="key-name">Am</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">1</span>
+                    <span class="key-name">C</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">2</span>
+                    <span class="key-name">Dm</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">3</span>
+                    <span class="key-name">Em</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">4</span>
+                    <span class="key-name">F</span>
+                </div>
+
+                <div class="key">
+                    <span class="key-number">5</span>
+                    <span class="key-name">G</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button id="startSynth">
+        ENABLE CAMERA + AUDIO
+    </button>
+
+</div>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script type="module">
+
+/*
+==========================================================
+   MEDIAPIPE
+==========================================================
+*/
+
+import {
+    HandLandmarker,
+    FilesetResolver,
+    DrawingUtils
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/+esm";
+
+
+/*
+==========================================================
+   ELEMENTS
+==========================================================
+*/
+
+const home =
+    document.getElementById("home");
+
+const synth =
+    document.getElementById("synth");
+
+const enterButton =
+    document.getElementById("enterSynth");
+
+const finalButton =
+    document.getElementById("finalStart");
+
+const backButton =
+    document.getElementById("backHome");
+
+const startButton =
+    document.getElementById("startSynth");
+
+const video =
+    document.getElementById("video");
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const leftNote =
+    document.getElementById("leftNote");
+
+const rightChord =
+    document.getElementById("rightChord");
+
+const liveText =
+    document.getElementById("liveText");
+
+const liveDot =
+    document.getElementById("liveDot");
+
+
+/*
+==========================================================
+   MUSIC
+==========================================================
+*/
+
+let audioContext = null;
+
+let masterGain = null;
+
+let currentChord = null;
+
+let chordOscillators = [];
+
+let previousLeft = null;
+
+
+/*
+   Frequencies
+*/
+
+const frequencies = {
+
+    C4: 261.63,
+    D4: 293.66,
+    E4: 329.63,
+    F4: 349.23,
+    G4: 392.00,
+
+    A3: 220.00,
+    A4: 440.00,
+
+    B3: 246.94,
+
+    C5: 523.25
+
+};
+
+
+/*
+   Melody
+*/
+
+const melodyMap = {
+
+    1: "C4",
+    2: "D4",
+    3: "E4",
+    4: "F4",
+    5: "G4"
+
+};
+
+
+/*
+   Chords
+*/
+
+const chordMap = {
+
+    0: {
+        name: "Am",
+        notes: ["A3", "C4", "E4"]
+    },
+
+    1: {
+        name: "C",
+        notes: ["C4", "E4", "G4"]
+    },
+
+    2: {
+        name: "Dm",
+        notes: ["D4", "F4", "A4"]
+    },
+
+    3: {
+        name: "Em",
+        notes: ["E4", "G4", "B3"]
+    },
+
+    4: {
+        name: "F",
+        notes: ["F4", "A4", "C5"]
+    },
+
+    5: {
+        name: "G",
+        notes: ["G4", "B3", "D4"]
+    }
+
+};
+
+
+/*
+==========================================================
+   AUDIO INITIALIZATION
+==========================================================
+*/
+
+function startAudio() {
+
+    audioContext =
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+    masterGain =
+        audioContext.createGain();
+
+    masterGain.gain.value = 0.18;
+
+    masterGain.connect(
+        audioContext.destination
+    );
+
+}
+
+
+/*
+==========================================================
+   PLAY MELODY NOTE
+==========================================================
+*/
+
+function playMelody(note) {
+
+    if (!audioContext) return;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+
+    oscillator.type = "sine";
+
+    oscillator.frequency.value =
+        frequencies[note];
+
+
+    gain.gain.setValueAtTime(
+        0,
+        audioContext.currentTime
+    );
+
+    gain.gain.linearRampToValueAtTime(
+        0.28,
+        audioContext.currentTime + 0.025
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime + 0.5
+    );
+
+
+    oscillator.connect(gain);
+
+    gain.connect(masterGain);
+
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + 0.51
+    );
+
+}
+
+
+/*
+==========================================================
+   STOP CHORD
+==========================================================
+*/
+
+function stopChord() {
+
+    chordOscillators.forEach(
+        oscillator => {
+
+            try {
+                oscillator.stop();
+            } catch {}
+
+        }
+    );
+
+    chordOscillators = [];
+
+}
+
+
+/*
+==========================================================
+   PLAY CHORD
+==========================================================
+*/
+
+function playChord(number) {
+
+    if (!audioContext) return;
+
+    if (currentChord === number) {
+        return;
+    }
+
+
+    stopChord();
+
+    currentChord = number;
+
+
+    const chord =
+        chordMap[number];
+
+
+    chord.notes.forEach(note => {
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+
+        oscillator.type = "triangle";
+
+        oscillator.frequency.value =
+            frequencies[note];
+
+
+        gain.gain.setValueAtTime(
+            0,
+            audioContext.currentTime
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            0.13,
+            audioContext.currentTime + 0.12
+        );
+
+
+        oscillator.connect(gain);
+
+        gain.connect(masterGain);
+
+
+        oscillator.start();
+
+
+        chordOscillators.push(
+            oscillator
+        );
+
+    });
+
+}
+
+
+/*
+==========================================================
+   RELEASE CHORD
+==========================================================
+*/
+
+function releaseChord() {
+
+    stopChord();
+
+    currentChord = null;
+
+}
+
+
+/*
+==========================================================
+   COUNT FINGERS
+==========================================================
+*/
+
+function countFingers(
+    landmarks,
+    handedness
+) {
+
+    let count = 0;
+
+
+    /*
+       Index
+    */
+
+    if (
+        landmarks[8].y <
+        landmarks[6].y
+    ) {
+        count++;
+    }
+
+
+    /*
+       Middle
+    */
+
+    if (
+        landmarks[12].y <
+        landmarks[10].y
+    ) {
+        count++;
+    }
+
+
+    /*
+       Ring
+    */
+
+    if (
+        landmarks[16].y <
+        landmarks[14].y
+    ) {
+        count++;
+    }
+
+
+    /*
+       Pinky
+    */
+
+    if (
+        landmarks[20].y <
+        landmarks[18].y
+    ) {
+        count++;
+    }
+
+
+    /*
+       Thumb
+    */
+
+    if (handedness === "Right") {
+
+        if (
+            landmarks[4].x <
+            landmarks[3].x
+        ) {
+            count++;
+        }
+
+    } else {
+
+        if (
+            landmarks[4].x >
+            landmarks[3].x
+        ) {
+            count++;
+        }
+
+    }
+
+
+    return count;
+
+}
+
+
+/*
+==========================================================
+   HIGHLIGHT KEY
+==========================================================
+*/
+
+function highlight(
+    cardIndex,
+    keyIndex
+) {
+
+    const cards =
+        document.querySelectorAll(
+            ".mapping-card"
+        );
+
+
+    const keys =
+        cards[
+            cardIndex
+        ].querySelectorAll(
+            ".key"
+        );
+
+
+    keys.forEach(
+        key =>
+            key.classList.remove(
+                "active"
+            )
+    );
+
+
+    if (keys[keyIndex]) {
+
+        keys[keyIndex]
+            .classList.add(
+                "active"
+            );
+
+    }
+
+}
+
+
+/*
+==========================================================
+   MEDIAPIPE
+==========================================================
+*/
+
+let handLandmarker = null;
+
+let lastVideoTime = -1;
+
+let running = false;
+
+
+async function setupHands() {
+
+    const vision =
+        await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm"
+        );
+
+
+    handLandmarker =
+        await HandLandmarker.createFromOptions(
+            vision,
+            {
+
+                baseOptions: {
+
+                    modelAssetPath:
+                        "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
+
+                },
+
+                runningMode: "VIDEO",
+
+                numHands: 2,
+
+                minHandDetectionConfidence: 0.5,
+
+                minHandPresenceConfidence: 0.5,
+
+                minTrackingConfidence: 0.5
+
+            }
+        );
+
+}
+
+
+/*
+==========================================================
+   PROCESS HANDS
+==========================================================
+*/
+
+function processHands(results) {
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    let foundLeft = false;
+
+    let foundRight = false;
+
+
+    if (
+        results.landmarks &&
+        results.landmarks.length
+    ) {
+
+        const drawingUtils =
+            new DrawingUtils(ctx);
+
+
+        results.landmarks.forEach(
+            (landmarks, index) => {
+
+
+                const handedness =
+                    results.handedness[
+                        index
+                    ][0]
+                    .categoryName;
+
+
+                const fingers =
+                    countFingers(
+                        landmarks,
+                        handedness
+                    );
+
+
+                /*
+                   Draw hand skeleton
+                */
+
+                drawingUtils.drawConnectors(
+                    landmarks,
+
+                    HandLandmarker.HAND_CONNECTIONS,
+
+                    {
+                        color: "#FFFFFF",
+                        lineWidth: 3
+                    }
+                );
+
+
+                drawingUtils.drawLandmarks(
+                    landmarks,
+
+                    {
+                        color: "#FFFFFF",
+                        radius: 4
+                    }
+                );
+
+
+                /*
+                   LEFT HAND
+                */
+
+                if (
+                    handedness === "Left"
+                ) {
+
+                    foundLeft = true;
+
+
+                    const note =
+                        melodyMap[
+                            fingers
+                        ];
+
+
+                    leftNote.textContent =
+                        note
+                            ? note.replace(
+                                "4",
+                                ""
+                              ).replace(
+                                "5",
+                                ""
+                              )
+                            : "—";
+
+
+                    if (note) {
+
+                        highlight(
+                            0,
+                            fingers - 1
+                        );
+
+
+                        if (
+                            fingers !==
+                            previousLeft
+                        ) {
+
+                            playMelody(note);
+
+                            previousLeft =
+                                fingers;
+
+                        }
+
+                    }
+
+                }
+
+
+                /*
+                   RIGHT HAND
+                */
+
+                if (
+                    handedness === "Right"
+                ) {
+
+                    foundRight = true;
+
+
+                    const chord =
+                        chordMap[
+                            fingers
+                        ];
+
+
+                    rightChord.textContent =
+                        chord
+                            ? chord.name
+                            : "—";
+
+
+                    if (chord) {
+
+                        highlight(
+                            1,
+                            fingers
+                        );
+
+
+                        playChord(
+                            fingers
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+       No left hand
+    */
+
+    if (!foundLeft) {
+
+        leftNote.textContent = "—";
+
+        previousLeft = null;
+
+        highlight(
+            0,
+            -1
+        );
+
+    }
+
+
+    /*
+       No right hand
+    */
+
+    if (!foundRight) {
+
+        rightChord.textContent = "—";
+
+        releaseChord();
+
+        highlight(
+            1,
+            -1
+        );
+
+    }
+
+}
+
+
+/*
+==========================================================
+   TRACKING LOOP
+==========================================================
+*/
+
+function trackingLoop() {
+
+    if (!running) return;
+
+
+    if (
+        video.readyState >= 2 &&
+        video.currentTime !==
+        lastVideoTime
+    ) {
+
+        const results =
+            handLandmarker.detectForVideo(
+                video,
+                performance.now()
+            );
+
+
+        processHands(results);
+
+
+        lastVideoTime =
+            video.currentTime;
+
+    }
+
+
+    requestAnimationFrame(
+        trackingLoop
+    );
+
+}
+
+
+/*
+==========================================================
+   START CAMERA
+==========================================================
+*/
+
+async function startExperience() {
+
+    try {
+
+        startButton.disabled = true;
+
+        startButton.textContent =
+            "STARTING...";
+
+
+        /*
+           Camera
+        */
+
+        const stream =
+            await navigator.mediaDevices
+                .getUserMedia({
+
+                    video: {
+                        width: 1280,
+                        height: 720
+                    },
+
+                    audio: false
+
+                });
+
+
+        video.srcObject = stream;
+
+
+        await video.play();
+
+
+        /*
+           Audio
+        */
+
+        startAudio();
+
+        await audioContext.resume();
+
+
+        /*
+           AI
+        */
+
+        await setupHands();
+
+
+        /*
+           Start
+        */
+
+        running = true;
+
+
+        liveText.textContent =
+            "LIVE";
+
+
+        liveDot.style.background =
+            "#fff";
+
+
+        startButton.textContent =
+            "RUNNING";
+
+
+        trackingLoop();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        liveText.textContent =
+            "ERROR";
+
+
+        startButton.disabled =
+            false;
+
+
+        startButton.textContent =
+            "TRY AGAIN";
+
+
+        alert(
+            "Something went wrong. Open the browser console (F12) to see the error."
+        );
+
+    }
+
+}
+
+
+/*
+==========================================================
+   PAGE NAVIGATION
+==========================================================
+*/
+
+function openSynth() {
+
+    home.style.display = "none";
+
+    synth.style.display = "block";
+
+    window.scrollTo(0, 0);
+
+}
+
+
+enterButton.addEventListener(
+    "click",
+    openSynth
+);
+
+
+finalButton.addEventListener(
+    "click",
+    openSynth
+);
+
+
+document
+    .querySelector(".nav-play")
+    .addEventListener(
+        "click",
+        openSynth
+    );
+
+
+backButton.addEventListener(
+    "click",
+    () => {
+
+        running = false;
+
+        releaseChord();
+
+
+        if (video.srcObject) {
+
+            video.srcObject
+                .getTracks()
+                .forEach(
+                    track =>
+                        track.stop()
+                );
+
+        }
+
+
+        synth.style.display =
+            "none";
+
+        home.style.display =
+            "block";
+
+        window.scrollTo(0, 0);
+
+    }
+);
+
+
+startButton.addEventListener(
+    "click",
+    startExperience
+);
+
+</script>
+
+</body>
+</html>
+```
