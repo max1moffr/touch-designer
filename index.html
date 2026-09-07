@@ -1,877 +1,2184 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Gesture Synth</title>
+<title>MAXMOTION</title>
+
+<meta
+    name="description"
+    content="MAXMOTION — a dreamy gesture-controlled musical instrument."
+>
 
 <style>
-/* =====================================================
+
+/* =========================================================
+   THEME
+========================================================= */
+
+:root{
+    --bg:#4a0b18;
+    --paper:#5a0d1c;
+
+    --fg:#050505;
+    --ink:#050505;
+
+    --accent:#ff174f;
+    --accent2:#c90032;
+
+    --white:#ffffff;
+
+    --muted:#d58b98;
+    --dim:#8d5260;
+
+    --line:rgba(5,5,5,.22);
+    --soft:rgba(255,255,255,.08);
+    --panel:rgba(0,0,0,.08);
+
+    --shadow:0 25px 80px rgba(0,0,0,.28);
+
+    --radius:28px;
+}
+
+
+/* =========================================================
    RESET
-====================================================== */
+========================================================= */
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*{
+    box-sizing:border-box;
 }
 
-html {
-    scroll-behavior: smooth;
+html{
+    scroll-behavior:smooth;
 }
 
-body {
-    background: #000;
-    color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
-    overflow-x: hidden;
-}
-
-button {
-    font-family: inherit;
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
 
-/* =====================================================
-   HOME
-===================================================== */
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-#home {
-    min-height: 100vh;
-}
-
-
-/* NAV */
+    overflow-x:hidden;
 
-nav {
-    height: 90px;
-    padding: 0 5vw;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    border-bottom: 1px solid #222;
+    transition:
+        background .5s ease,
+        color .4s ease;
 }
 
-.logo {
-    font-size: 12px;
-    line-height: 1.05;
-    letter-spacing: 3px;
-    font-weight: bold;
+button,
+input{
+    font:inherit;
 }
 
-.nav-links {
-    display: flex;
-    gap: 35px;
-    align-items: center;
+button{
+    cursor:pointer;
 }
 
-.nav-links span {
-    color: #777;
-    font-size: 10px;
-    letter-spacing: 2px;
+a{
+    color:inherit;
+    text-decoration:none;
 }
 
-.nav-play {
-    color: white !important;
-    border: 1px solid #444;
-    padding: 12px 18px;
+::selection{
+    background:var(--accent);
+    color:#ffffff;
 }
-
 
-/* HERO */
 
-.hero {
-    min-height: calc(100vh - 90px);
+/* =========================================================
+   NOISE
+========================================================= */
 
-    padding: 8vw 5vw;
+.noise{
+    position:fixed;
+    inset:0;
 
-    position: relative;
+    pointer-events:none;
 
-    display: flex;
-    align-items: center;
+    z-index:100;
 
-    border-bottom: 1px solid #222;
-}
-
-.hero-number {
-    position: absolute;
-    top: 35px;
-    left: 5vw;
-
-    color: #555;
-    font-size: 10px;
-    letter-spacing: 2px;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 5;
-}
+    opacity:.045;
 
-.eyebrow {
-    color: #666;
-    font-size: 10px;
-    letter-spacing: 3px;
-    margin-bottom: 25px;
+    background-image:url(
+        "data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E"
+    );
 }
 
-.hero h1 {
-    font-size: clamp(60px, 10vw, 145px);
-    line-height: .82;
-    letter-spacing: -7px;
-    font-weight: 600;
-}
 
-.hero h1 span {
-    color: #666;
-}
+/* =========================================================
+   CUSTOM CURSOR
+========================================================= */
 
-.hero-description {
-    margin-top: 45px;
+.cursor-dot{
+    width:10px;
+    height:10px;
 
-    max-width: 370px;
+    border:1px solid var(--fg);
 
-    color: #888;
+    border-radius:50%;
 
-    font-size: 14px;
-    line-height: 1.7;
-}
+    position:fixed;
 
-.enter {
-    margin-top: 40px;
+    left:0;
+    top:0;
 
-    display: inline-flex;
-    align-items: center;
-    gap: 40px;
+    pointer-events:none;
 
-    padding: 17px 22px;
+    z-index:9999;
 
-    border: 1px solid #555;
+    transform:
+        translate(-50%,-50%);
 
-    background: transparent;
-    color: white;
+    mix-blend-mode:difference;
 
-    cursor: pointer;
+    transition:
+        width .25s,
+        height .25s,
+        background .25s;
+}
 
-    font-size: 10px;
-    letter-spacing: 3px;
+.cursor-ring{
+    width:34px;
+    height:34px;
 
-    transition: .25s;
-}
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--fg) 35%,
+            transparent
+        );
 
-.enter:hover {
-    background: white;
-    color: black;
-}
+    border-radius:50%;
 
-.enter span {
-    font-size: 18px;
-}
+    position:fixed;
 
+    left:0;
+    top:0;
 
-/* ABSTRACT ART */
+    pointer-events:none;
 
-.hero-art {
-    position: absolute;
+    z-index:9998;
 
-    right: 7vw;
+    transform:
+        translate(-50%,-50%);
 
-    width: 420px;
-    height: 520px;
+    transition:
+        transform .12s ease,
+        width .25s,
+        height .25s;
 }
 
-.circle {
-    position: absolute;
+body.hovering .cursor-dot{
+    width:24px;
+    height:24px;
 
-    border: 1px solid #2c2c2c;
-
-    border-radius: 50%;
+    background:var(--accent);
 }
 
-.c1 {
-    width: 420px;
-    height: 420px;
+body.hovering .cursor-ring{
+    width:48px;
+    height:48px;
 
-    top: 50px;
+    border-color:var(--accent);
 }
 
-.c2 {
-    width: 300px;
-    height: 300px;
 
-    top: 110px;
-    left: 60px;
-}
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
-.c3 {
-    width: 130px;
-    height: 130px;
+nav{
+    position:fixed;
 
-    top: 195px;
-    left: 145px;
-}
+    top:0;
+    left:0;
+    right:0;
 
-.line {
-    position: absolute;
+    z-index:80;
 
-    width: 1px;
+    height:76px;
 
-    background: white;
+    padding:
+        0
+        5vw;
 
-    transform-origin: bottom;
-}
+    display:flex;
 
-.l1 {
-    height: 170px;
-    left: 205px;
-    top: 40px;
-    transform: rotate(-32deg);
-}
+    align-items:center;
 
-.l2 {
-    height: 215px;
-    left: 230px;
-    top: 35px;
-    transform: rotate(-13deg);
-}
+    justify-content:space-between;
 
-.l3 {
-    height: 235px;
-    left: 255px;
-    top: 35px;
-}
+    border-bottom:
+        1px solid
+        var(--line);
 
-.l4 {
-    height: 205px;
-    left: 280px;
-    top: 45px;
-    transform: rotate(13deg);
-}
+    background:
+        color-mix(
+            in srgb,
+            var(--bg) 82%,
+            transparent
+        );
 
-.l5 {
-    height: 160px;
-    left: 305px;
-    top: 75px;
-    transform: rotate(30deg);
+    backdrop-filter:blur(18px);
 }
 
-.art-label {
-    position: absolute;
+.logo{
+    font-size:13px;
 
-    right: 0;
-    bottom: 0;
+    letter-spacing:.18em;
 
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    font-weight:700;
 
-    color: #555;
-
-    font-size: 8px;
-    letter-spacing: 2px;
+    color:var(--fg);
 }
 
+.navlinks{
+    display:flex;
 
-/* ABOUT */
+    gap:28px;
 
-.about {
-    min-height: 550px;
+    font-size:10px;
 
-    padding: 100px 5vw;
+    text-transform:uppercase;
 
-    display: grid;
-    grid-template-columns: 100px 1fr;
-
-    border-bottom: 1px solid #222;
+    letter-spacing:.16em;
 }
 
-.section-number {
-    color: #555;
-    font-size: 10px;
-    letter-spacing: 2px;
-}
+.navlinks a{
+    opacity:.72;
 
-.about h2 {
-    font-size: clamp(45px, 7vw, 100px);
-    line-height: .88;
-    letter-spacing: -5px;
-    font-weight: 500;
+    transition:
+        opacity .2s,
+        color .2s;
 }
 
-.about p {
-    margin-top: 45px;
+.navlinks a:hover{
+    opacity:1;
 
-    max-width: 450px;
-
-    color: #777;
-
-    font-size: 14px;
-    line-height: 1.8;
+    color:var(--accent);
 }
-
 
-/* HOW */
+.nav-right{
+    display:flex;
 
-.how {
-    min-height: 500px;
+    align-items:center;
 
-    padding: 100px 5vw;
-
-    display: grid;
-    grid-template-columns: 100px 1fr;
-
-    border-bottom: 1px solid #222;
+    gap:15px;
 }
-
-.steps {
-    margin-top: 60px;
 
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+.mini-orb{
+    width:10px;
+    height:10px;
 
-    gap: 20px;
-}
+    border-radius:50%;
 
-.step {
-    min-height: 230px;
+    background:var(--accent);
 
-    border-top: 1px solid #333;
-
-    padding-top: 20px;
+    box-shadow:
+        0 0 0 5px
+        rgba(255,23,79,.12);
 }
 
-.step-number {
-    color: #555;
-    font-size: 10px;
-}
 
-.step h3 {
-    margin-top: 60px;
+/* =========================================================
+   GENERAL
+========================================================= */
 
-    font-size: 13px;
-    letter-spacing: 2px;
-    font-weight: 400;
+main{
+    position:relative;
 }
 
-.step p {
-    margin-top: 18px;
+.section{
+    position:relative;
 
-    max-width: 230px;
-
-    color: #666;
-
-    font-size: 12px;
-    line-height: 1.7;
+    padding:
+        150px
+        7vw;
 }
 
+.eyebrow{
+    font-size:10px;
 
-/* FINAL */
+    letter-spacing:.2em;
 
-.final {
-    min-height: 650px;
+    text-transform:uppercase;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    color:var(--accent);
 
-    text-align: center;
+    font-weight:700;
 }
-
-.final-small {
-    color: #555;
 
-    font-size: 10px;
-    letter-spacing: 4px;
+.serif{
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-    margin-bottom: 35px;
-}
+    font-style:italic;
 
-.final h2 {
-    font-size: clamp(55px, 9vw, 130px);
-    line-height: .82;
-    letter-spacing: -6px;
-    font-weight: 500;
+    font-weight:400;
 }
 
-.final button {
-    margin-top: 55px;
+.display{
+    margin:0;
 
-    padding: 18px 25px;
+    font-size:
+        clamp(
+            70px,
+            13vw,
+            190px
+        );
 
-    border: 1px solid #555;
+    line-height:.78;
 
-    background: transparent;
-    color: white;
+    letter-spacing:-.075em;
 
-    cursor: pointer;
-
-    font-size: 10px;
-    letter-spacing: 3px;
-}
+    font-weight:700;
 
-.final button:hover {
-    background: white;
-    color: black;
+    color:var(--fg);
 }
-
-
-/* FOOTER */
-
-footer {
-    height: 70px;
 
-    padding: 0 5vw;
+.small-copy{
+    font-size:13px;
 
-    border-top: 1px solid #222;
+    line-height:1.8;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    color:var(--muted);
 
-    color: #444;
-
-    font-size: 8px;
-    letter-spacing: 2px;
+    max-width:390px;
 }
 
 
-/* =====================================================
-   SYNTH
-===================================================== */
+/* =========================================================
+   HERO
+========================================================= */
 
-#synth {
-    display: none;
+.hero{
+    min-height:100vh;
 
-    min-height: 100vh;
-
-    padding: 25px 4vw;
-}
+    padding:
+        150px
+        7vw
+        90px;
 
+    display:grid;
 
-/* SYNTH NAV */
+    grid-template-columns:
+        1.05fr
+        .95fr;
 
-.synth-nav {
-    height: 65px;
+    align-items:center;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    gap:5vw;
 
-    border-bottom: 1px solid #222;
+    overflow:hidden;
 }
-
-.back {
-    border: 0;
-
-    background: transparent;
-    color: #777;
-
-    cursor: pointer;
 
-    font-size: 10px;
-    letter-spacing: 2px;
-}
+.hero-copy{
+    position:relative;
 
-.back:hover {
-    color: white;
+    z-index:4;
 }
 
-.synth-title {
-    font-size: 12px;
-    letter-spacing: 4px;
-}
+.hero-kicker{
+    display:flex;
 
-.live {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    align-items:center;
 
-    color: #777;
+    gap:12px;
 
-    font-size: 9px;
-    letter-spacing: 2px;
+    margin-bottom:36px;
 }
 
-.live-dot {
-    width: 7px;
-    height: 7px;
+.hero-kicker:before{
+    content:"";
 
-    border-radius: 50%;
+    width:42px;
+    height:2px;
 
-    background: #444;
+    background:var(--accent);
 }
-
 
-/* CAMERA */
-
-.camera-wrap {
-    margin-top: 25px;
+.hero-title{
+    font-size:
+        clamp(
+            80px,
+            13.5vw,
+            205px
+        );
+}
 
-    position: relative;
+.hero-title .dream{
+    display:block;
 
-    width: 100%;
+    margin-left:8vw;
 
-    background: #090909;
+    font-size:.42em;
 
-    border: 1px solid #292929;
+    line-height:1.05;
 
-    overflow: hidden;
+    letter-spacing:-.05em;
 
-    aspect-ratio: 16 / 8.5;
+    color:var(--accent);
 }
-
-#video {
-    position: absolute;
 
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transform: scaleX(-1);
-
-    background: #111;
+.hero-description{
+    margin:
+        48px
+        0
+        0
+        8vw;
 }
 
-#canvas {
-    position: absolute;
+.hero-actions{
+    display:flex;
 
-    inset: 0;
+    gap:12px;
 
-    width: 100%;
-    height: 100%;
+    margin:
+        32px
+        0
+        0
+        8vw;
 
-    transform: scaleX(-1);
-
-    pointer-events: none;
+    flex-wrap:wrap;
 }
-
-
-/* CAMERA UI */
 
-.camera-ui {
-    position: absolute;
 
-    inset: 0;
+/* =========================================================
+   BUTTONS
+========================================================= */
 
-    pointer-events: none;
-}
+.pill{
+    border:
+        1px solid
+        var(--fg);
 
-.hand-display {
-    position: absolute;
+    border-radius:999px;
 
-    top: 25px;
-}
+    background:transparent;
 
-.left-display {
-    left: 25px;
-}
+    padding:
+        13px
+        20px;
 
-.right-display {
-    right: 25px;
+    font-size:10px;
 
-    text-align: right;
-}
+    text-transform:uppercase;
 
-.hand-display label {
-    display: block;
+    letter-spacing:.15em;
 
-    color: #777;
+    color:var(--fg);
 
-    font-size: 9px;
-    letter-spacing: 3px;
+    transition:
+        transform .3s,
+        background .3s,
+        color .3s,
+        border-color .3s;
 }
 
-.hand-display strong {
-    display: block;
+.pill:hover{
+    transform:
+        translateY(-3px);
 
-    margin-top: 5px;
-
-    font-size: 40px;
-    font-weight: 400;
-}
+    background:var(--accent);
 
-.hand-display small {
-    color: #555;
+    border-color:var(--accent);
 
-    font-size: 8px;
-    letter-spacing: 2px;
+    color:#ffffff;
 }
 
 
-/* INSTRUCTIONS */
+/* =========================================================
+   DREAMSCAPE
+========================================================= */
 
-.instructions {
-    position: absolute;
+.dreamscape{
+    height:650px;
 
-    bottom: 20px;
-    left: 25px;
+    position:relative;
 
-    color: #666;
+    display:grid;
 
-    font-size: 9px;
-    letter-spacing: 1px;
+    place-items:center;
 }
 
+.orbit{
+    position:absolute;
 
-/* MAPPINGS */
+    border:
+        1px solid
+        var(--line);
 
-.mapping-area {
-    margin-top: 20px;
+    border-radius:50%;
 
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 20px;
+    animation:
+        spin 24s linear infinite;
 }
-
-.mapping-card {
-    padding: 20px;
 
-    background: #090909;
-
-    border: 1px solid #222;
+.orbit.one{
+    width:520px;
+    height:520px;
 }
 
-.mapping-title {
-    color: #777;
+.orbit.two{
+    width:360px;
+    height:360px;
 
-    font-size: 9px;
+    animation-duration:17s;
 
-    letter-spacing: 3px;
+    animation-direction:reverse;
 }
-
-.keys {
-    display: grid;
-
-    grid-template-columns: repeat(5, 1fr);
 
-    gap: 7px;
+.orbit.three{
+    width:200px;
+    height:200px;
 
-    margin-top: 15px;
+    animation-duration:11s;
 }
 
-.keys.chords {
-    grid-template-columns: repeat(6, 1fr);
-}
-
-.key {
-    height: 55px;
-
-    border: 1px solid #292929;
+.orbit:after{
+    content:"";
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    position:absolute;
 
-    gap: 4px;
+    width:7px;
+    height:7px;
 
-    transition: .1s;
-}
+    border-radius:50%;
 
-.key-number {
-    color: #555;
+    background:var(--fg);
 
-    font-size: 8px;
+    top:4%;
+    left:50%;
 }
 
-.key-name {
-    font-size: 14px;
+.orbit.two:after{
+    background:var(--accent);
 }
 
-.key.active {
-    background: white;
-    color: black;
+.orbit.three:after{
+    background:#ffffff;
 }
 
-.key.active .key-number {
-    color: #555;
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
 }
-
-
-/* START */
 
-#startSynth {
-    display: block;
+.dream-ball{
+    width:270px;
+    height:270px;
 
-    margin: 25px auto;
+    border-radius:
+        48%
+        52%
+        58%
+        42%;
 
-    padding: 15px 25px;
+    background:
+        radial-gradient(
+            circle at 32% 28%,
+            rgba(255,255,255,.45),
+            transparent 21%
+        ),
 
-    border: 1px solid #444;
+        radial-gradient(
+            circle at 72% 65%,
+            rgba(255,255,255,.14),
+            transparent 27%
+        ),
 
-    background: white;
-    color: black;
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
 
-    cursor: pointer;
+    box-shadow:
+        inset -22px -20px 45px
+        rgba(0,0,0,.22),
 
-    font-size: 10px;
-    letter-spacing: 3px;
-}
-
-#startSynth:hover {
-    background: #ddd;
-}
+        0 35px 90px
+        rgba(0,0,0,.25);
 
-#startSynth:disabled {
-    opacity: .4;
+    animation:
+        float 5s ease-in-out infinite;
 }
-
-
-/* RESPONSIVE */
-
-@media(max-width:900px) {
 
-    .hero-art {
-        right: -140px;
-        opacity: .25;
+@keyframes float{
+    0%,
+    100%{
+        transform:
+            translateY(0)
+            rotate(-3deg);
     }
 
-    .steps {
-        grid-template-columns: 1fr;
+    50%{
+        transform:
+            translateY(-22px)
+            rotate(5deg);
     }
-
 }
 
-@media(max-width:600px) {
+.spark{
+    position:absolute;
 
-    nav {
-        padding: 0 20px;
-    }
+    font-family:
+        Georgia,
+        serif;
 
-    .nav-links span:not(.nav-play) {
-        display: none;
-    }
+    font-size:26px;
 
-    .hero {
-        padding: 100px 20px;
-    }
+    color:var(--accent);
 
-    .hero h1 {
-        letter-spacing: -3px;
-    }
-
-    .hero-art {
-        right: -230px;
-    }
-
-    .about,
-    .how {
-        padding: 80px 20px;
-
-        grid-template-columns: 1fr;
-
-        gap: 40px;
-    }
-
-    .mapping-area {
-        grid-template-columns: 1fr;
-    }
-
-    .keys.chords {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    footer {
-        padding: 0 20px;
-    }
-
-    footer span:nth-child(2) {
-        display: none;
-    }
-
+    animation:
+        drift 5s ease-in-out infinite;
 }
+
+.s1{
+    top:13%;
+    left:18%;
+}
+
+.s2{
+    top:28%;
+    right:9%;
+
+    color:#ffffff;
+
+    animation-delay:1s;
+}
+
+.s3{
+    bottom:19%;
+    left:12%;
+
+    animation-delay:2s;
+}
+
+.s4{
+    bottom:8%;
+    right:20%;
+
+    animation-delay:3s;
+}
+
+@keyframes drift{
+    0%,
+    100%{
+        transform:
+            translate(0,0)
+            rotate(0);
+
+        opacity:.55;
+    }
+
+    50%{
+        transform:
+            translate(10px,-16px)
+            rotate(15deg);
+
+        opacity:1;
+    }
+}
+
+
+/* =========================================================
+   MARQUEE
+========================================================= */
+
+.marquee-wrap{
+    border-top:
+        1px solid
+        var(--line);
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+    overflow:hidden;
+
+    padding:13px 0;
+}
+
+.marquee{
+    display:flex;
+
+    width:max-content;
+
+    animation:
+        marquee 25s linear infinite;
+}
+
+.marquee span{
+    font-size:11px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.18em;
+
+    padding:
+        0
+        32px;
+}
+
+.marquee .star{
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:16px;
+
+    color:var(--accent);
+}
+
+@keyframes marquee{
+    to{
+        transform:
+            translateX(-50%);
+    }
+}
+
+
+/* =========================================================
+   IDEA
+========================================================= */
+
+.intro{
+    min-height:90vh;
+
+    display:grid;
+
+    grid-template-columns:90px 1fr;
+
+    gap:5vw;
+}
+
+.section-number{
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:18px;
+
+    font-style:italic;
+
+    color:var(--accent);
+}
+
+.intro-content{
+    max-width:1100px;
+}
+
+.big-question{
+    font-size:
+        clamp(
+            50px,
+            8vw,
+            115px
+        );
+
+    line-height:.95;
+
+    letter-spacing:-.055em;
+
+    margin:
+        0
+        0
+        70px;
+
+    color:var(--fg);
+}
+
+.big-question em{
+    font-family:
+        Georgia,
+        serif;
+
+    font-weight:400;
+
+    color:var(--accent);
+}
+
+.floating-note{
+    margin-left:auto;
+
+    width:min(
+        480px,
+        70vw
+    );
+
+    padding:30px;
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius:50%;
+
+    aspect-ratio:1;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    background:var(--soft);
+
+    backdrop-filter:blur(14px);
+
+    transform:rotate(7deg);
+
+    box-shadow:var(--shadow);
+}
+
+.floating-note p{
+    max-width:250px;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:24px;
+
+    line-height:1.15;
+
+    color:var(--fg);
+}
+
+
+/* =========================================================
+   STEPS
+========================================================= */
+
+.steps{
+    padding-top:80px;
+}
+
+.step-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    border-top:
+        1px solid
+        var(--line);
+
+    margin-top:60px;
+}
+
+.step{
+    min-height:390px;
+
+    padding:
+        30px
+        24px
+        40px
+        0;
+
+    border-right:
+        1px solid
+        var(--line);
+
+    position:relative;
+}
+
+.step:not(:first-child){
+    padding-left:25px;
+}
+
+.step:last-child{
+    border-right:0;
+}
+
+.step-num{
+    font-size:10px;
+
+    letter-spacing:.15em;
+
+    color:var(--accent);
+
+    font-weight:700;
+}
+
+.step h3{
+    font-size:
+        clamp(
+            32px,
+            4vw,
+            62px
+        );
+
+    line-height:.9;
+
+    letter-spacing:-.05em;
+
+    margin:
+        100px
+        0
+        24px;
+
+    color:var(--fg);
+}
+
+.step h3 .serif{
+    color:var(--accent);
+}
+
+.step p{
+    font-size:12px;
+
+    color:var(--muted);
+
+    line-height:1.7;
+
+    max-width:270px;
+}
+
+.step .decor{
+    position:absolute;
+
+    right:25px;
+    top:25px;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:22px;
+
+    color:var(--accent);
+}
+
+
+/* =========================================================
+   CTA
+========================================================= */
+
+.cta{
+    min-height:80vh;
+
+    display:grid;
+
+    place-items:center;
+
+    text-align:center;
+
+    overflow:hidden;
+
+    background:var(--paper);
+
+    border-top:
+        1px solid
+        var(--line);
+
+    border-bottom:
+        1px solid
+        var(--line);
+}
+
+.cta:before,
+.cta:after{
+    content:"";
+
+    position:absolute;
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius:50%;
+
+    width:55vw;
+    height:55vw;
+
+    animation:
+        pulse 8s ease-in-out infinite;
+}
+
+.cta:after{
+    width:35vw;
+    height:35vw;
+
+    animation-delay:-3s;
+}
+
+@keyframes pulse{
+    0%,
+    100%{
+        transform:scale(1);
+        opacity:.4;
+    }
+
+    50%{
+        transform:scale(1.08);
+        opacity:.8;
+    }
+}
+
+.cta-content{
+    position:relative;
+
+    z-index:2;
+}
+
+.cta h2{
+    font-size:
+        clamp(
+            65px,
+            12vw,
+            175px
+        );
+
+    line-height:.8;
+
+    letter-spacing:-.07em;
+
+    margin:
+        20px
+        0
+        45px;
+
+    color:var(--fg);
+}
+
+.cta h2 .serif{
+    font-size:.58em;
+
+    color:var(--accent);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+    padding:
+        45px
+        7vw;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:30px;
+
+    border-top:
+        1px solid
+        var(--line);
+
+    font-size:10px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.13em;
+
+    color:var(--muted);
+}
+
+footer strong{
+    color:var(--accent);
+}
+
+
+/* =========================================================
+   SYNTH PAGE
+========================================================= */
+
+#synthPage{
+    display:none;
+
+    min-height:100vh;
+
+    padding-top:76px;
+}
+
+.synth-head{
+    padding:
+        75px
+        6vw
+        35px;
+
+    display:flex;
+
+    align-items:end;
+
+    justify-content:space-between;
+
+    gap:30px;
+}
+
+.synth-title{
+    font-size:
+        clamp(
+            55px,
+            9vw,
+            125px
+        );
+
+    line-height:.8;
+
+    letter-spacing:-.065em;
+
+    margin:
+        12px
+        0
+        0;
+
+    color:var(--fg);
+}
+
+.synth-title .serif{
+    color:var(--accent);
+}
+
+.synth-shell{
+    margin:
+        20px
+        6vw
+        80px;
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius:var(--radius);
+
+    overflow:hidden;
+
+    background:var(--panel);
+
+    box-shadow:var(--shadow);
+}
+
+.synth-toolbar{
+    padding:
+        16px
+        20px;
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    font-size:10px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.12em;
+}
+
+.status{
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+.status-dot{
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:#777;
+}
+
+.status-dot.live{
+    background:var(--accent);
+
+    box-shadow:
+        0 0 0 5px
+        rgba(255,23,79,.12);
+}
+
+.synth-grid{
+    display:grid;
+
+    grid-template-columns:
+        1.5fr
+        1fr;
+}
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+.camera-panel{
+    min-height:620px;
+
+    padding:28px;
+
+    position:relative;
+
+    border-right:
+        1px solid
+        var(--line);
+}
+
+.camera-frame{
+    width:100%;
+    height:100%;
+
+    min-height:560px;
+
+    border-radius:22px;
+
+    overflow:hidden;
+
+    position:relative;
+
+    background:#21070e;
+
+    border:
+        1px solid
+        var(--line);
+}
+
+#webcam{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+
+    transform:scaleX(-1);
+
+    background:#21070e;
+}
+
+#output_canvas{
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    transform:scaleX(-1);
+
+    pointer-events:none;
+
+    z-index:2;
+}
+
+.camera-label{
+    position:absolute;
+
+    top:18px;
+    left:18px;
+    right:18px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:9px;
+
+    letter-spacing:.12em;
+
+    text-transform:uppercase;
+
+    z-index:4;
+
+    color:white;
+
+    text-shadow:
+        0 1px 5px rgba(0,0,0,.8);
+}
+
+
+/* =========================================================
+   LIVE NOTE / CHORD DISPLAY
+========================================================= */
+
+.hand-displays{
+    position:absolute;
+
+    left:18px;
+    right:18px;
+    bottom:18px;
+
+    z-index:4;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    pointer-events:none;
+}
+
+.hand-display{
+    min-height:105px;
+
+    padding:14px 16px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.25);
+
+    border-radius:18px;
+
+    background:
+        rgba(0,0,0,.68);
+
+    backdrop-filter:blur(14px);
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    box-shadow:
+        0 12px 35px
+        rgba(0,0,0,.2);
+
+    transition:
+        border-color .25s ease,
+        transform .25s ease;
+}
+
+.hand-display label{
+    font-size:8px;
+
+    letter-spacing:.16em;
+
+    text-transform:uppercase;
+
+    color:rgba(255,255,255,.7);
+
+    margin-bottom:4px;
+}
+
+.hand-display strong{
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-style:italic;
+
+    font-size:42px;
+
+    line-height:1;
+
+    color:var(--accent);
+
+    min-height:42px;
+
+    text-shadow:
+        0 0 20px
+        rgba(255,23,79,.35);
+}
+
+.hand-display small{
+    margin-top:5px;
+
+    font-size:8px;
+
+    letter-spacing:.14em;
+
+    text-transform:uppercase;
+
+    color:#ffffff;
+}
+
+
+/* =========================================================
+   CAMERA START OVERLAY
+========================================================= */
+
+.start-overlay{
+    position:absolute;
+
+    inset:0;
+
+    display:grid;
+
+    place-items:center;
+
+    z-index:5;
+
+    background:
+        rgba(74,11,24,.74);
+
+    backdrop-filter:blur(8px);
+}
+
+.start-btn{
+    border:
+        1px solid
+        var(--accent);
+
+    background:
+        var(--accent);
+
+    color:
+        #ffffff;
+
+    padding:
+        18px
+        28px;
+
+    border-radius:999px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.16em;
+
+    font-size:10px;
+
+    transition:
+        transform .3s,
+        opacity .3s,
+        background .3s;
+}
+
+.start-btn:hover{
+    transform:scale(1.04);
+
+    background:#ff315f;
+}
+
+.start-btn:disabled{
+    cursor:wait;
+
+    opacity:.6;
+}
+
+
+/* =========================================================
+   CAMERA ERROR
+========================================================= */
+
+.camera-error{
+    position:absolute;
+
+    left:24px;
+    right:24px;
+    bottom:24px;
+
+    z-index:7;
+
+    padding:
+        16px
+        18px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.25);
+
+    border-radius:14px;
+
+    background:
+        rgba(0,0,0,.75);
+
+    color:white;
+
+    font-size:11px;
+
+    line-height:1.5;
+
+    display:none;
+
+    backdrop-filter:blur(12px);
+}
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+.controls{
+    padding:28px;
+}
+
+.control-card{
+    border-bottom:
+        1px solid
+        var(--line);
+
+    padding:
+        0
+        0
+        25px;
+
+    margin-bottom:25px;
+}
+
+.control-card:last-child{
+    border:0;
+}
+
+.control-card h4{
+    font-size:11px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.15em;
+
+    margin:
+        0
+        0
+        16px;
+
+    color:var(--accent);
+}
+
+.control-card p{
+    font-size:11px;
+
+    line-height:1.65;
+
+    color:var(--muted);
+}
+
+.key-row{
+    display:flex;
+
+    gap:7px;
+
+    flex-wrap:wrap;
+}
+
+.key{
+    width:54px;
+    height:54px;
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius:50%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:2px;
+
+    color:var(--fg);
+
+    transition:
+        background .2s,
+        color .2s,
+        transform .2s,
+        border-color .2s;
+
+    overflow:hidden;
+}
+
+.key-number{
+    font-size:7px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+
+    opacity:.6;
+
+    line-height:1;
+}
+
+.key-name{
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-style:italic;
+
+    font-size:17px;
+
+    line-height:1;
+}
+
+.key.active{
+    background:var(--accent);
+
+    color:#ffffff;
+
+    border-color:var(--accent);
+
+    transform:scale(1.08);
+
+    box-shadow:
+        0 0 20px
+        rgba(255,23,79,.25);
+}
+
+.key.active .key-number{
+    opacity:.85;
+}
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+.theme-row{
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
+}
+
+.theme-btn{
+    width:28px;
+    height:28px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        var(--line);
+
+    padding:0;
+
+    transition:
+        transform .2s,
+        box-shadow .2s;
+}
+
+.theme-btn:hover{
+    transform:scale(1.12);
+}
+
+.theme-btn.active{
+    box-shadow:
+        0 0 0 2px
+        var(--accent);
+}
+
+#customColor{
+    width:28px;
+    height:28px;
+
+    border:
+        1px solid
+        var(--line);
+
+    padding:0;
+
+    background:none;
+
+    border-radius:50%;
+
+    overflow:hidden;
+}
+
+.back-btn{
+    border:0;
+
+    background:none;
+
+    font-size:10px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.15em;
+
+    padding:0;
+
+    color:var(--muted);
+}
+
+.back-btn:hover{
+    color:var(--accent);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:850px){
+
+    .navlinks{
+        display:none;
+    }
+
+    .hero{
+        grid-template-columns:1fr;
+
+        padding-top:125px;
+    }
+
+    .dreamscape{
+        height:480px;
+
+        margin-top:-50px;
+    }
+
+    .orbit.one{
+        width:400px;
+        height:400px;
+    }
+
+    .orbit.two{
+        width:280px;
+        height:280px;
+    }
+
+    .orbit.three{
+        width:160px;
+        height:160px;
+    }
+
+    .dream-ball{
+        width:210px;
+        height:210px;
+    }
+
+    .intro{
+        grid-template-columns:1fr;
+
+        gap:25px;
+    }
+
+    .floating-note{
+        margin-top:50px;
+    }
+
+    .step-grid{
+        grid-template-columns:1fr;
+    }
+
+    .step{
+        border-right:0;
+
+        border-bottom:
+            1px solid
+            var(--line);
+
+        min-height:300px;
+
+        padding:30px 0;
+    }
+
+    .step:not(:first-child){
+        padding-left:0;
+    }
+
+    .step h3{
+        margin-top:65px;
+    }
+
+    .synth-grid{
+        grid-template-columns:1fr;
+    }
+
+    .camera-panel{
+        border-right:0;
+
+        border-bottom:
+            1px solid
+            var(--line);
+    }
+
+    .synth-head{
+        display:block;
+    }
+
+    footer{
+        flex-direction:column;
+    }
+}
+
+@media(max-width:520px){
+
+    .section{
+        padding:
+            110px
+            6vw;
+    }
+
+    .hero{
+        padding-left:6vw;
+        padding-right:6vw;
+    }
+
+    .hero-title{
+        font-size:25vw;
+    }
+
+    .hero-description,
+    .hero-actions{
+        margin-left:0;
+    }
+
+    .dreamscape{
+        height:390px;
+    }
+
+    .orbit.one{
+        width:320px;
+        height:320px;
+    }
+
+    .orbit.two{
+        width:230px;
+        height:230px;
+    }
+
+    .orbit.three{
+        width:140px;
+        height:140px;
+    }
+
+    .dream-ball{
+        width:170px;
+        height:170px;
+    }
+
+    .synth-shell{
+        margin-left:3vw;
+        margin-right:3vw;
+    }
+
+    .camera-panel{
+        padding:12px;
+    }
+
+    .controls{
+        padding:20px;
+    }
+
+    .camera-frame{
+        min-height:420px;
+    }
+
+    .synth-toolbar{
+        font-size:8px;
+    }
+
+    .hand-displays{
+        grid-template-columns:1fr 1fr;
+
+        gap:6px;
+
+        left:10px;
+        right:10px;
+        bottom:10px;
+    }
+
+    .hand-display{
+        min-height:80px;
+
+        padding:10px 11px;
+
+        border-radius:14px;
+    }
+
+    .hand-display strong{
+        font-size:31px;
+
+        min-height:31px;
+    }
+
+    .hand-display label{
+        font-size:7px;
+    }
+
+    .hand-display small{
+        font-size:7px;
+    }
+
+    .key{
+        width:50px;
+        height:50px;
+    }
+}
+
 </style>
 </head>
 
-
 <body>
 
+<div class="noise"></div>
 
-<!-- =====================================================
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+
+<!-- =======================================================
+     NAV
+======================================================= -->
+
+<nav>
+
+    <a
+        href="#"
+        class="logo"
+        data-page="home"
+    >
+        MAXMOTION
+    </a>
+
+    <div class="navlinks">
+
+        <a href="#idea">
+            idea
+        </a>
+
+        <a href="#how">
+            how it works
+        </a>
+
+        <a
+            href="#"
+            data-page="synth"
+        >
+            play
+        </a>
+
+    </div>
+
+    <div class="nav-right">
+
+        <span class="mini-orb"></span>
+
+        <a
+            href="#"
+            data-page="synth"
+            style="
+                font-size:10px;
+                text-transform:uppercase;
+                letter-spacing:.15em;
+            "
+        >
+            enter
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- =======================================================
      HOME
-===================================================== -->
+======================================================= -->
 
-<div id="home">
-
-    <nav>
-
-        <div class="logo">
-            GESTURE<br>SYNTH
-        </div>
-
-        <div class="nav-links">
-
-            <span>ABOUT</span>
-
-            <span>HOW IT WORKS</span>
-
-            <span class="nav-play">PLAY ↗</span>
-
-        </div>
-
-    </nav>
-
+<main id="homePage">
 
     <section class="hero">
 
-        <div class="hero-number">
+        <div class="hero-copy">
+
+            <div class="hero-kicker eyebrow">
+                gesture × sound / 2026
+            </div>
+
+            <h1 class="display hero-title">
+
+                MAX
+
+                <span class="serif dream">
+                    motion
+                </span>
+
+            </h1>
+
+            <p class="small-copy hero-description">
+
+                A little instrument for your hands.
+                <br>
+                Move. Make. Listen.
+
+            </p>
+
+            <div class="hero-actions">
+
+                <a
+                    class="pill"
+                    href="#idea"
+                >
+                    discover
+                </a>
+
+                <a
+                    class="pill"
+                    href="#"
+                    data-page="synth"
+                >
+                    play the instrument
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="dreamscape"
+            aria-hidden="true"
+        >
+
+            <div class="orbit one"></div>
+
+            <div class="orbit two"></div>
+
+            <div class="orbit three"></div>
+
+            <div class="dream-ball"></div>
+
+            <span class="spark s1">
+                ✦
+            </span>
+
+            <span class="spark s2">
+                ·
+            </span>
+
+            <span class="spark s3">
+                ✧
+            </span>
+
+            <span class="spark s4">
+                ✦
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- MARQUEE -->
+
+    <div class="marquee-wrap">
+
+        <div class="marquee">
+
+            <span>
+                play without touching
+            </span>
+
+            <span class="star">✦</span>
+
+            <span>
+                gesture becomes sound
+            </span>
+
+            <span class="star">✧</span>
+
+            <span>
+                webcam instrument
+            </span>
+
+            <span class="star">·</span>
+
+            <span>
+                make music in the air
+            </span>
+
+            <span class="star">✦</span>
+
+            <span>
+                play without touching
+            </span>
+
+            <span class="star">✦</span>
+
+            <span>
+                gesture becomes sound
+            </span>
+
+            <span class="star">✧</span>
+
+            <span>
+                webcam instrument
+            </span>
+
+            <span class="star">·</span>
+
+            <span>
+                make music in the air
+            </span>
+
+            <span class="star">✦</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- IDEA -->
+
+    <section
+        class="section intro"
+        id="idea"
+    >
+
+        <div class="section-number">
             01
         </div>
 
-        <div class="hero-content">
+        <div class="intro-content">
 
             <div class="eyebrow">
-                A WEBCAM-BASED MUSICAL INSTRUMENT
+                the idea
             </div>
 
-            <h1>
-                PLAY MUSIC<br>
-                <span>WITH YOUR</span><br>
-                HANDS.
-            </h1>
+            <h2 class="big-question">
 
-            <p class="hero-description">
-                Turn your hands into an instrument.
-                Shape melodies with one hand,
-                chords with the other.
+                What if your hands could become an
+
+                <em>
+                    instrument?
+                </em>
+
+            </h2>
+
+            <p class="small-copy">
+
+                MAXMOTION turns the movement of your
+                hands into music using your camera,
+                hand tracking, and sound.
+
+                No keys.
+                No strings.
+                No physical instrument.
+
+                Just motion.
+
             </p>
 
-            <button class="enter" id="enterSynth">
-                ENTER SYNTH
-                <span>→</span>
-            </button>
+            <div class="floating-note">
 
-        </div>
+                <p>
+                    “music, but make it feel a little like magic.”
+                </p>
 
-
-        <div class="hero-art">
-
-            <div class="circle c1"></div>
-            <div class="circle c2"></div>
-            <div class="circle c3"></div>
-
-            <div class="line l1"></div>
-            <div class="line l2"></div>
-            <div class="line l3"></div>
-            <div class="line l4"></div>
-            <div class="line l5"></div>
-
-            <div class="art-label">
-                <span>GESTURE</span>
-                <span>01 — 05</span>
             </div>
 
         </div>
@@ -879,312 +2186,596 @@ footer {
     </section>
 
 
-    <section class="about">
+    <!-- HOW IT WORKS -->
 
-        <div class="section-number">
-            02
+    <section
+        class="section steps"
+        id="how"
+    >
+
+        <div class="eyebrow">
+            02 / how it works
         </div>
 
-        <div>
+        <div class="step-grid">
+
+            <article class="step">
+
+                <span class="step-num">
+                    01 — SEE
+                </span>
+
+                <span class="decor">
+                    ◌
+                </span>
+
+                <h3>
+                    your
+                    <br>
+                    <span class="serif">
+                        hands
+                    </span>
+                </h3>
+
+                <p>
+                    Your webcam watches your movements
+                    and tracks the position of your hands
+                    in real time.
+                </p>
+
+            </article>
+
+
+            <article class="step">
+
+                <span class="step-num">
+                    02 — MOVE
+                </span>
+
+                <span class="decor">
+                    ✧
+                </span>
+
+                <h3>
+                    your
+                    <br>
+                    <span class="serif">
+                        motion
+                    </span>
+                </h3>
+
+                <p>
+                    Different gestures become different
+                    musical notes and chords.
+                    Your hands become the controls.
+                </p>
+
+            </article>
+
+
+            <article class="step">
+
+                <span class="step-num">
+                    03 — HEAR
+                </span>
+
+                <span class="decor">
+                    ♪
+                </span>
+
+                <h3>
+                    your
+                    <br>
+                    <span class="serif">
+                        sound
+                    </span>
+                </h3>
+
+                <p>
+                    Move again.
+                    Experiment.
+                    Layer sounds.
+                    There is no wrong way to play.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- CTA -->
+
+    <section class="section cta">
+
+        <div class="cta-content">
 
             <div class="eyebrow">
-                THE IDEA
+                03 / the playground
             </div>
 
             <h2>
-                WHAT IF YOUR<br>
-                HANDS WERE<br>
-                THE INSTRUMENT?
+
+                make
+
+                <br>
+
+                <span class="serif">
+                    something
+                </span>
+
             </h2>
 
-            <p>
-                Gesture Synth transforms movement into
-                music. Your webcam tracks your hands
-                in real time and translates simple
-                gestures into notes and chords.
-            </p>
+            <a
+                href="#"
+                data-page="synth"
+                class="pill"
+            >
+                enter maxmotion
+            </a>
 
         </div>
 
     </section>
 
+</main>
 
-    <section class="how">
 
-        <div class="section-number">
-            03
-        </div>
+<!-- =======================================================
+     SYNTH PAGE
+======================================================= -->
+
+<section id="synthPage">
+
+    <div class="synth-head">
 
         <div>
 
             <div class="eyebrow">
-                HOW IT WORKS
+                MAXMOTION / PLAYGROUND
             </div>
 
-            <div class="steps">
+            <h1 class="synth-title">
 
-                <div class="step">
+                make
 
-                    <div class="step-number">01</div>
+                <span class="serif">
+                    music.
+                </span>
 
-                    <h3>
-                        SHOW YOUR HANDS
-                    </h3>
-
-                    <p>
-                        Your webcam detects the
-                        position of your fingers.
-                    </p>
-
-                </div>
-
-
-                <div class="step">
-
-                    <div class="step-number">02</div>
-
-                    <h3>
-                        MAKE A GESTURE
-                    </h3>
-
-                    <p>
-                        Finger combinations become
-                        musical notes and chords.
-                    </p>
-
-                </div>
-
-
-                <div class="step">
-
-                    <div class="step-number">03</div>
-
-                    <h3>
-                        MAKE MUSIC
-                    </h3>
-
-                    <p>
-                        Combine melody and harmony
-                        using both hands.
-                    </p>
-
-                </div>
-
-            </div>
+            </h1>
 
         </div>
 
-    </section>
-
-
-    <section class="final">
-
-        <div class="final-small">
-            READY?
-        </div>
-
-        <h2>
-            YOUR HANDS<br>
-            ARE THE<br>
-            INSTRUMENT.
-        </h2>
-
-        <button id="finalStart">
-            START PLAYING ↗
+        <button
+            class="back-btn"
+            id="backButton"
+        >
+            ← back to the dream
         </button>
 
-    </section>
+    </div>
 
 
-    <footer>
+    <div class="synth-shell">
 
-        <span>GESTURE SYNTH</span>
+        <div class="synth-toolbar">
 
-        <span>HAND TRACKING × WEB AUDIO</span>
+            <div class="status">
 
-        <span>2026</span>
+                <span
+                    class="status-dot"
+                    id="statusDot"
+                ></span>
 
-    </footer>
+                <span id="statusText">
+                    camera offline
+                </span>
 
-</div>
+            </div>
 
+            <div>
+                gesture instrument / live
+            </div>
 
-
-<!-- =====================================================
-     SYNTH
-===================================================== -->
-
-<div id="synth">
-
-    <div class="synth-nav">
-
-        <button class="back" id="backHome">
-            ← BACK
-        </button>
-
-        <div class="synth-title">
-            GESTURE SYNTH
         </div>
 
-        <div class="live">
-            <div class="live-dot" id="liveDot"></div>
-            <span id="liveText">OFFLINE</span>
+
+        <div class="synth-grid">
+
+
+            <!-- CAMERA -->
+
+            <div class="camera-panel">
+
+                <div class="camera-frame">
+
+                    <video
+                        id="webcam"
+                        autoplay
+                        playsinline
+                        muted
+                    ></video>
+
+                    <canvas
+                        id="output_canvas"
+                    ></canvas>
+
+
+                    <div class="camera-label">
+
+                        <span>
+                            hand tracking
+                        </span>
+
+                        <span id="handCount">
+                            0 hands
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         LIVE NOTE / CHORD NAMES
+                    ================================================== -->
+
+                    <div class="hand-displays">
+
+                        <div class="hand-display left-display">
+
+                            <label>
+                                LEFT HAND
+                            </label>
+
+                            <strong id="leftNote">
+                                —
+                            </strong>
+
+                            <small>
+                                MELODY
+                            </small>
+
+                        </div>
+
+
+                        <div class="hand-display right-display">
+
+                            <label>
+                                RIGHT HAND
+                            </label>
+
+                            <strong id="rightChord">
+                                —
+                            </strong>
+
+                            <small>
+                                CHORD
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="start-overlay"
+                        id="startOverlay"
+                    >
+
+                        <button
+                            class="start-btn"
+                            id="startButton"
+                        >
+                            start playing
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="camera-error"
+                        id="cameraError"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTROLS -->
+
+            <aside class="controls">
+
+                <div class="control-card">
+
+                    <h4>
+                        left hand / melody
+                    </h4>
+
+                    <p>
+                        Use the number of raised fingers
+                        to trigger different notes.
+                        Keep your gesture visible to sustain the note.
+                    </p>
+
+                    <div class="key-row">
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                1 finger
+                            </span>
+
+                            <span class="key-name">
+                                C
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                2 fingers
+                            </span>
+
+                            <span class="key-name">
+                                D
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                3 fingers
+                            </span>
+
+                            <span class="key-name">
+                                E
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                4 fingers
+                            </span>
+
+                            <span class="key-name">
+                                F
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                5 fingers
+                            </span>
+
+                            <span class="key-name">
+                                G
+                            </span>
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="control-card">
+
+                    <h4>
+                        right hand / chords
+                    </h4>
+
+                    <p>
+                        Use different gestures to move
+                        through the chord palette.
+                        Keep your hand visible to sustain the chord.
+                    </p>
+
+                    <div class="key-row">
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                fist
+                            </span>
+
+                            <span class="key-name">
+                                Am
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                1 finger
+                            </span>
+
+                            <span class="key-name">
+                                C
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                2 fingers
+                            </span>
+
+                            <span class="key-name">
+                                Dm
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                3 fingers
+                            </span>
+
+                            <span class="key-name">
+                                Em
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                4 fingers
+                            </span>
+
+                            <span class="key-name">
+                                F
+                            </span>
+
+                        </span>
+
+                        <span class="key">
+
+                            <span class="key-number">
+                                5 fingers
+                            </span>
+
+                            <span class="key-name">
+                                G
+                            </span>
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="control-card">
+
+                    <h4>
+                        atmosphere
+                    </h4>
+
+                    <p>
+                        Change the background to match
+                        the mood you're making.
+                    </p>
+
+                    <div class="theme-row">
+
+                        <button
+                            class="theme-btn"
+                            data-bg="#4a0b18"
+                            style="background:#4a0b18"
+                            aria-label="maroon"
+                        ></button>
+
+                        <button
+                            class="theme-btn"
+                            data-bg="#000000"
+                            style="background:#000000"
+                            aria-label="black"
+                        ></button>
+
+                        <button
+                            class="theme-btn"
+                            data-bg="#7d1028"
+                            style="background:#7d1028"
+                            aria-label="red"
+                        ></button>
+
+                        <button
+                            class="theme-btn"
+                            data-bg="#f7f3ed"
+                            style="background:#f7f3ed"
+                            aria-label="cream"
+                        ></button>
+
+                        <button
+                            class="theme-btn"
+                            data-bg="#eee8f1"
+                            style="background:#eee8f1"
+                            aria-label="lavender"
+                        ></button>
+
+                        <button
+                            class="theme-btn"
+                            data-bg="#f2e3df"
+                            style="background:#f2e3df"
+                            aria-label="rose"
+                        ></button>
+
+                        <input
+                            type="color"
+                            id="customColor"
+                            value="#4a0b18"
+                            aria-label="custom background"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="control-card">
+
+                    <h4>
+                        little reminder
+                    </h4>
+
+                    <p>
+                        Give the camera a little space,
+                        keep your hands visible, and
+                        don't take it too seriously.
+                    </p>
+
+                </div>
+
+            </aside>
+
         </div>
 
     </div>
 
-
-    <div class="camera-wrap">
-
-        <video
-            id="video"
-            autoplay
-            playsinline
-            muted>
-        </video>
-
-        <canvas id="canvas"></canvas>
+</section>
 
 
-        <div class="camera-ui">
+<!-- =======================================================
+     FOOTER
+======================================================= -->
 
-            <div class="hand-display left-display">
+<footer>
 
-                <label>LEFT HAND</label>
+    <span>
+        <strong>
+            MAXMOTION
+        </strong>
+        — gesture × sound
+    </span>
 
-                <strong id="leftNote">—</strong>
+    <span>
+        made to be played
+    </span>
 
-                <small>MELODY</small>
-
-            </div>
-
-
-            <div class="hand-display right-display">
-
-                <label>RIGHT HAND</label>
-
-                <strong id="rightChord">—</strong>
-
-                <small>CHORD</small>
-
-            </div>
+</footer>
 
 
-            <div class="instructions">
-                LEFT = MELODY &nbsp;&nbsp; / &nbsp;&nbsp;
-                RIGHT = CHORD
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="mapping-area">
-
-
-        <div class="mapping-card">
-
-            <div class="mapping-title">
-                LEFT HAND / MELODY
-            </div>
-
-            <div class="keys">
-
-                <div class="key">
-                    <span class="key-number">1 FINGER</span>
-                    <span class="key-name">C</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">2 FINGERS</span>
-                    <span class="key-name">D</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">3 FINGERS</span>
-                    <span class="key-name">E</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">4 FINGERS</span>
-                    <span class="key-name">F</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">5 FINGERS</span>
-                    <span class="key-name">G</span>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="mapping-card">
-
-            <div class="mapping-title">
-                RIGHT HAND / CHORD
-            </div>
-
-            <div class="keys chords">
-
-                <div class="key">
-                    <span class="key-number">FIST</span>
-                    <span class="key-name">Am</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">1</span>
-                    <span class="key-name">C</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">2</span>
-                    <span class="key-name">Dm</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">3</span>
-                    <span class="key-name">Em</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">4</span>
-                    <span class="key-name">F</span>
-                </div>
-
-                <div class="key">
-                    <span class="key-number">5</span>
-                    <span class="key-name">G</span>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <button id="startSynth">
-        ENABLE CAMERA + AUDIO
-    </button>
-
-</div>
-
-
-
-<!-- =====================================================
-     JAVASCRIPT
-===================================================== -->
+<!-- =======================================================
+     MAXMOTION ENGINE
+======================================================= -->
 
 <script type="module">
 
-/*
-==========================================================
-   MEDIAPIPE
-==========================================================
-*/
+/* =========================================================
+   MEDIAPIPE IMPORT
+========================================================= */
 
 import {
     HandLandmarker,
@@ -1193,38 +2784,66 @@ import {
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/+esm";
 
 
-/*
-==========================================================
+/* =========================================================
    ELEMENTS
-==========================================================
-*/
+========================================================= */
 
-const home =
-    document.getElementById("home");
+const homePage =
+    document.getElementById("homePage");
 
-const synth =
-    document.getElementById("synth");
-
-const enterButton =
-    document.getElementById("enterSynth");
-
-const finalButton =
-    document.getElementById("finalStart");
-
-const backButton =
-    document.getElementById("backHome");
+const synthPage =
+    document.getElementById("synthPage");
 
 const startButton =
-    document.getElementById("startSynth");
+    document.getElementById("startButton");
+
+const startOverlay =
+    document.getElementById("startOverlay");
+
+const backButton =
+    document.getElementById("backButton");
 
 const video =
-    document.getElementById("video");
+    document.getElementById("webcam");
 
 const canvas =
-    document.getElementById("canvas");
+    document.getElementById("output_canvas");
 
 const ctx =
     canvas.getContext("2d");
+
+const statusText =
+    document.getElementById("statusText");
+
+const statusDot =
+    document.getElementById("statusDot");
+
+const handCount =
+    document.getElementById("handCount");
+
+const cameraError =
+    document.getElementById("cameraError");
+
+const customColor =
+    document.getElementById("customColor");
+
+const themeButtons =
+    document.querySelectorAll(".theme-btn");
+
+const leftKeys =
+    document.querySelectorAll(
+        ".control-card:nth-child(1) .key"
+    );
+
+const rightKeys =
+    document.querySelectorAll(
+        ".control-card:nth-child(2) .key"
+    );
+
+
+/* =========================================================
+   NEW: LIVE NOTE / CHORD DISPLAY ELEMENTS
+========================================================= */
 
 const leftNote =
     document.getElementById("leftNote");
@@ -1232,418 +2851,865 @@ const leftNote =
 const rightChord =
     document.getElementById("rightChord");
 
-const liveText =
-    document.getElementById("liveText");
 
-const liveDot =
-    document.getElementById("liveDot");
+/* =========================================================
+   STATE
+========================================================= */
+
+let handLandmarker = null;
+
+let drawingUtils = null;
+
+let webcamStream = null;
+
+let webcamRunning = false;
+
+let trackingRunning = false;
+
+let lastVideoTime = -1;
 
 
-/*
-==========================================================
-   MUSIC
-==========================================================
-*/
+/* =========================================================
+   AUDIO STATE
+========================================================= */
 
 let audioContext = null;
 
 let masterGain = null;
 
+let melodyOscillator = null;
+
+let melodyGain = null;
+
+let currentMelodyFinger = null;
+
 let currentChord = null;
 
 let chordOscillators = [];
 
-let previousLeft = null;
+
+/* =========================================================
+   HAND GRACE PERIOD
+========================================================= */
+
+let lastLeftSeen =
+    0;
+
+let lastRightSeen =
+    0;
+
+const HAND_GRACE_TIME =
+    120;
 
 
-/*
-   Frequencies
-*/
+/* =========================================================
+   CAMERA ERROR DISPLAY
+========================================================= */
 
-const frequencies = {
+function showCameraError(message){
 
-    C4: 261.63,
-    D4: 293.66,
-    E4: 329.63,
-    F4: 349.23,
-    G4: 392.00,
+    cameraError.textContent =
+        message;
 
-    A3: 220.00,
-    A4: 440.00,
-
-    B3: 246.94,
-
-    C5: 523.25
-
-};
-
-
-/*
-   Melody
-*/
-
-const melodyMap = {
-
-    1: "C4",
-    2: "D4",
-    3: "E4",
-    4: "F4",
-    5: "G4"
-
-};
-
-
-/*
-   Chords
-*/
-
-const chordMap = {
-
-    0: {
-        name: "Am",
-        notes: ["A3", "C4", "E4"]
-    },
-
-    1: {
-        name: "C",
-        notes: ["C4", "E4", "G4"]
-    },
-
-    2: {
-        name: "Dm",
-        notes: ["D4", "F4", "A4"]
-    },
-
-    3: {
-        name: "Em",
-        notes: ["E4", "G4", "B3"]
-    },
-
-    4: {
-        name: "F",
-        notes: ["F4", "A4", "C5"]
-    },
-
-    5: {
-        name: "G",
-        notes: ["G4", "B3", "D4"]
-    }
-
-};
-
-
-/*
-==========================================================
-   AUDIO INITIALIZATION
-==========================================================
-*/
-
-function startAudio() {
-
-    audioContext =
-        new (
-            window.AudioContext ||
-            window.webkitAudioContext
-        )();
-
-    masterGain =
-        audioContext.createGain();
-
-    masterGain.gain.value = 0.18;
-
-    masterGain.connect(
-        audioContext.destination
-    );
+    cameraError.style.display =
+        "block";
 
 }
 
 
-/*
-==========================================================
-   PLAY MELODY NOTE
-==========================================================
-*/
+/* =========================================================
+   CLEAR CAMERA ERROR
+========================================================= */
 
-function playMelody(note) {
+function clearCameraError(){
 
-    if (!audioContext) return;
+    cameraError.textContent =
+        "";
 
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-
-    oscillator.type = "sine";
-
-    oscillator.frequency.value =
-        frequencies[note];
-
-
-    gain.gain.setValueAtTime(
-        0,
-        audioContext.currentTime
-    );
-
-    gain.gain.linearRampToValueAtTime(
-        0.28,
-        audioContext.currentTime + 0.025
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.001,
-        audioContext.currentTime + 0.5
-    );
-
-
-    oscillator.connect(gain);
-
-    gain.connect(masterGain);
-
-
-    oscillator.start();
-
-    oscillator.stop(
-        audioContext.currentTime + 0.51
-    );
+    cameraError.style.display =
+        "none";
 
 }
 
 
-/*
-==========================================================
-   STOP CHORD
-==========================================================
-*/
+/* =========================================================
+   THEME BRIGHTNESS
+========================================================= */
 
-function stopChord() {
+function getBrightness(hex){
 
-    chordOscillators.forEach(
-        oscillator => {
+    hex =
+        hex.replace("#","");
 
-            try {
-                oscillator.stop();
-            } catch {}
-
-        }
-    );
-
-    chordOscillators = [];
-
-}
-
-
-/*
-==========================================================
-   PLAY CHORD
-==========================================================
-*/
-
-function playChord(number) {
-
-    if (!audioContext) return;
-
-    if (currentChord === number) {
-        return;
-    }
-
-
-    stopChord();
-
-    currentChord = number;
-
-
-    const chord =
-        chordMap[number];
-
-
-    chord.notes.forEach(note => {
-
-        const oscillator =
-            audioContext.createOscillator();
-
-        const gain =
-            audioContext.createGain();
-
-
-        oscillator.type = "triangle";
-
-        oscillator.frequency.value =
-            frequencies[note];
-
-
-        gain.gain.setValueAtTime(
-            0,
-            audioContext.currentTime
+    const r =
+        parseInt(
+            hex.substring(0,2),
+            16
         );
 
-        gain.gain.linearRampToValueAtTime(
-            0.13,
-            audioContext.currentTime + 0.12
+    const g =
+        parseInt(
+            hex.substring(2,4),
+            16
         );
 
+    const b =
+        parseInt(
+            hex.substring(4,6),
+            16
+        );
 
-        oscillator.connect(gain);
+    return (
+        r * 299 +
+        g * 587 +
+        b * 114
+    ) / 1000;
 
-        gain.connect(masterGain);
+}
 
 
-        oscillator.start();
+/* =========================================================
+   APPLY THEME
+========================================================= */
 
+function applyTheme(color){
 
-        chordOscillators.push(
-            oscillator
+    const brightness =
+        getBrightness(color);
+
+    const isLight =
+        brightness > 150;
+
+    const foreground =
+        "#050505";
+
+    const muted =
+        isLight
+            ? "#555555"
+            : "#d58b98";
+
+    const dim =
+        isLight
+            ? "#888888"
+            : "#8d5260";
+
+    const border =
+        isLight
+            ? "rgba(0,0,0,.14)"
+            : "rgba(5,5,5,.22)";
+
+    const panel =
+        isLight
+            ? "rgba(0,0,0,.035)"
+            : "rgba(0,0,0,.08)";
+
+    document.documentElement.style.setProperty(
+        "--bg",
+        color
+    );
+
+    document.documentElement.style.setProperty(
+        "--paper",
+        color
+    );
+
+    document.documentElement.style.setProperty(
+        "--fg",
+        foreground
+    );
+
+    document.documentElement.style.setProperty(
+        "--ink",
+        foreground
+    );
+
+    document.documentElement.style.setProperty(
+        "--muted",
+        muted
+    );
+
+    document.documentElement.style.setProperty(
+        "--dim",
+        dim
+    );
+
+    document.documentElement.style.setProperty(
+        "--line",
+        border
+    );
+
+    document.documentElement.style.setProperty(
+        "--panel",
+        panel
+    );
+
+    if(customColor){
+
+        customColor.value =
+            color;
+
+    }
+
+    themeButtons.forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.bg.toLowerCase() ===
+            color.toLowerCase()
         );
 
     });
 
+    localStorage.setItem(
+        "maxMotionBackground",
+        color
+    );
+
 }
 
 
-/*
-==========================================================
-   RELEASE CHORD
-==========================================================
-*/
+/* =========================================================
+   LOAD SAVED THEME
+========================================================= */
 
-function releaseChord() {
+const savedTheme =
+    localStorage.getItem(
+        "maxMotionBackground"
+    );
+
+applyTheme(
+    savedTheme ||
+    "#4a0b18"
+);
+
+
+/* =========================================================
+   THEME BUTTONS
+========================================================= */
+
+themeButtons.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            applyTheme(
+                button.dataset.bg
+            );
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   CUSTOM COLOR
+========================================================= */
+
+customColor.addEventListener(
+    "input",
+    event => {
+
+        applyTheme(
+            event.target.value
+        );
+
+    }
+);
+
+
+/* =========================================================
+   AUDIO FREQUENCIES
+========================================================= */
+
+const frequencies = {
+
+    C4:261.63,
+    D4:293.66,
+    E4:329.63,
+    F4:349.23,
+    G4:392.00,
+
+    A3:220.00,
+    A4:440.00,
+    B3:246.94,
+    C5:523.25
+
+};
+
+
+/* =========================================================
+   MELODY MAP
+========================================================= */
+
+const melodyMap = {
+
+    1:"C4",
+    2:"D4",
+    3:"E4",
+    4:"F4",
+    5:"G4"
+
+};
+
+
+/* =========================================================
+   CHORD MAP
+========================================================= */
+
+const chordMap = {
+
+    0:{
+        name:"Am",
+        notes:[
+            "A3",
+            "C4",
+            "E4"
+        ]
+    },
+
+    1:{
+        name:"C",
+        notes:[
+            "C4",
+            "E4",
+            "G4"
+        ]
+    },
+
+    2:{
+        name:"Dm",
+        notes:[
+            "D4",
+            "F4",
+            "A4"
+        ]
+    },
+
+    3:{
+        name:"Em",
+        notes:[
+            "E4",
+            "G4",
+            "B3"
+        ]
+    },
+
+    4:{
+        name:"F",
+        notes:[
+            "F4",
+            "A4",
+            "C5"
+        ]
+    },
+
+    5:{
+        name:"G",
+        notes:[
+            "G4",
+            "B3",
+            "D4"
+        ]
+    }
+
+};
+
+
+/* =========================================================
+   START AUDIO
+========================================================= */
+
+async function startAudio(){
+
+    if(!audioContext){
+
+        const AudioCtx =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if(!AudioCtx){
+
+            throw new Error(
+                "Web Audio is not supported by this browser."
+            );
+
+        }
+
+        audioContext =
+            new AudioCtx();
+
+        masterGain =
+            audioContext.createGain();
+
+        masterGain.gain.value =
+            0.18;
+
+        masterGain.connect(
+            audioContext.destination
+        );
+
+    }
+
+    if(
+        audioContext.state ===
+        "suspended"
+    ){
+
+        await audioContext.resume();
+
+    }
+
+}
+
+
+/* =========================================================
+   STOP MELODY
+========================================================= */
+
+function stopMelody(){
+
+    if(
+        !melodyOscillator ||
+        !melodyGain ||
+        !audioContext
+    ){
+
+        melodyOscillator =
+            null;
+
+        melodyGain =
+            null;
+
+        currentMelodyFinger =
+            null;
+
+        return;
+
+    }
+
+    const now =
+        audioContext.currentTime;
+
+    try{
+
+        melodyGain.gain.cancelScheduledValues(
+            now
+        );
+
+        melodyGain.gain.setValueAtTime(
+            Math.max(
+                melodyGain.gain.value,
+                0.0001
+            ),
+            now
+        );
+
+        melodyGain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            now + 0.12
+        );
+
+        melodyOscillator.stop(
+            now + 0.13
+        );
+
+    }catch(error){
+
+        console.warn(
+            "Melody release:",
+            error
+        );
+
+    }
+
+    melodyOscillator =
+        null;
+
+    melodyGain =
+        null;
+
+    currentMelodyFinger =
+        null;
+
+}
+
+
+/* =========================================================
+   PLAY / SUSTAIN MELODY
+========================================================= */
+
+function playMelodySustained(
+    fingerCount
+){
+
+    if(
+        !audioContext ||
+        !masterGain
+    ){
+
+        return;
+
+    }
+
+    const note =
+        melodyMap[
+            fingerCount
+        ];
+
+    if(!note){
+
+        stopMelody();
+
+        return;
+
+    }
+
+    if(
+        currentMelodyFinger ===
+        fingerCount &&
+        melodyOscillator
+    ){
+
+        return;
+
+    }
+
+    stopMelody();
+
+    currentMelodyFinger =
+        fingerCount;
+
+    melodyOscillator =
+        audioContext.createOscillator();
+
+    melodyGain =
+        audioContext.createGain();
+
+    melodyOscillator.type =
+        "sine";
+
+    melodyOscillator.frequency.setValueAtTime(
+        frequencies[note],
+        audioContext.currentTime
+    );
+
+    melodyGain.gain.setValueAtTime(
+        0.0001,
+        audioContext.currentTime
+    );
+
+    melodyGain.gain.exponentialRampToValueAtTime(
+        0.28,
+        audioContext.currentTime + 0.08
+    );
+
+    melodyOscillator
+        .connect(melodyGain)
+        .connect(masterGain);
+
+    melodyOscillator.start();
+
+}
+
+
+/* =========================================================
+   STOP CHORD
+========================================================= */
+
+function stopChord(){
+
+    if(
+        !audioContext ||
+        chordOscillators.length === 0
+    ){
+
+        chordOscillators =
+            [];
+
+        currentChord =
+            null;
+
+        return;
+
+    }
+
+    const now =
+        audioContext.currentTime;
+
+    chordOscillators.forEach(
+        item => {
+
+            try{
+
+                item.gain.gain.cancelScheduledValues(
+                    now
+                );
+
+                item.gain.gain.setValueAtTime(
+                    Math.max(
+                        item.gain.gain.value,
+                        0.0001
+                    ),
+                    now
+                );
+
+                item.gain.gain.exponentialRampToValueAtTime(
+                    0.0001,
+                    now + 0.18
+                );
+
+                item.oscillator.stop(
+                    now + 0.2
+                );
+
+            }catch(error){
+
+                console.warn(
+                    "Chord release:",
+                    error
+                );
+
+            }
+
+        }
+    );
+
+    chordOscillators =
+        [];
+
+    currentChord =
+        null;
+
+}
+
+
+/* =========================================================
+   PLAY / SUSTAIN CHORD
+========================================================= */
+
+function playChord(
+    number
+){
+
+    if(
+        !audioContext ||
+        !masterGain
+    ){
+
+        return;
+
+    }
+
+    if(
+        currentChord === number &&
+        chordOscillators.length > 0
+    ){
+
+        return;
+
+    }
 
     stopChord();
 
-    currentChord = null;
+    const chord =
+        chordMap[number];
+
+    if(!chord){
+
+        return;
+
+    }
+
+    currentChord =
+        number;
+
+    const now =
+        audioContext.currentTime;
+
+    chord.notes.forEach(
+        note => {
+
+            const oscillator =
+                audioContext.createOscillator();
+
+            const gain =
+                audioContext.createGain();
+
+            oscillator.type =
+                "triangle";
+
+            oscillator.frequency.setValueAtTime(
+                frequencies[note],
+                now
+            );
+
+            gain.gain.setValueAtTime(
+                0.0001,
+                now
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.13,
+                now + 0.15
+            );
+
+            oscillator
+                .connect(gain)
+                .connect(masterGain);
+
+            oscillator.start(
+                now
+            );
+
+            chordOscillators.push({
+
+                oscillator:
+                    oscillator,
+
+                gain:
+                    gain
+
+            });
+
+        }
+    );
 
 }
 
 
-/*
-==========================================================
+/* =========================================================
+   RELEASE ALL AUDIO
+========================================================= */
+
+function releaseAllAudio(){
+
+    stopMelody();
+
+    stopChord();
+
+}
+
+
+/* =========================================================
    COUNT FINGERS
-==========================================================
-*/
+========================================================= */
 
 function countFingers(
     landmarks,
     handedness
-) {
+){
 
-    let count = 0;
+    if(!landmarks){
 
+        return 0;
 
-    /*
-       Index
-    */
+    }
 
-    if (
+    let count =
+        0;
+
+    /* INDEX */
+
+    if(
         landmarks[8].y <
         landmarks[6].y
-    ) {
+    ){
+
         count++;
+
     }
 
+    /* MIDDLE */
 
-    /*
-       Middle
-    */
-
-    if (
+    if(
         landmarks[12].y <
         landmarks[10].y
-    ) {
+    ){
+
         count++;
+
     }
 
+    /* RING */
 
-    /*
-       Ring
-    */
-
-    if (
+    if(
         landmarks[16].y <
         landmarks[14].y
-    ) {
+    ){
+
         count++;
+
     }
 
+    /* PINKY */
 
-    /*
-       Pinky
-    */
-
-    if (
+    if(
         landmarks[20].y <
         landmarks[18].y
-    ) {
+    ){
+
         count++;
+
     }
 
+    /* THUMB */
 
-    /*
-       Thumb
-    */
+    if(
+        handedness ===
+        "Right"
+    ){
 
-    if (handedness === "Right") {
-
-        if (
+        if(
             landmarks[4].x <
             landmarks[3].x
-        ) {
+        ){
+
             count++;
+
         }
 
-    } else {
+    }else{
 
-        if (
+        if(
             landmarks[4].x >
             landmarks[3].x
-        ) {
+        ){
+
             count++;
+
         }
 
     }
-
 
     return count;
 
 }
 
 
-/*
-==========================================================
-   HIGHLIGHT KEY
-==========================================================
-*/
+/* =========================================================
+   HIGHLIGHT LEFT KEY
+========================================================= */
 
-function highlight(
-    cardIndex,
-    keyIndex
-) {
+function highlightLeft(index){
 
-    const cards =
-        document.querySelectorAll(
-            ".mapping-card"
-        );
+    leftKeys.forEach(
+        key => {
 
-
-    const keys =
-        cards[
-            cardIndex
-        ].querySelectorAll(
-            ".key"
-        );
-
-
-    keys.forEach(
-        key =>
             key.classList.remove(
                 "active"
-            )
+            );
+
+        }
     );
 
+    if(
+        index >= 0 &&
+        leftKeys[index]
+    ){
 
-    if (keys[keyIndex]) {
-
-        keys[keyIndex]
+        leftKeys[index]
             .classList.add(
                 "active"
             );
@@ -1653,69 +3719,653 @@ function highlight(
 }
 
 
-/*
-==========================================================
-   MEDIAPIPE
-==========================================================
-*/
+/* =========================================================
+   HIGHLIGHT RIGHT KEY
+========================================================= */
 
-let handLandmarker = null;
+function highlightRight(index){
 
-let lastVideoTime = -1;
+    rightKeys.forEach(
+        key => {
 
-let running = false;
+            key.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+    if(
+        index >= 0 &&
+        rightKeys[index]
+    ){
+
+        rightKeys[index]
+            .classList.add(
+                "active"
+            );
+
+    }
+
+}
 
 
-async function setupHands() {
+/* =========================================================
+   CREATE MEDIAPIPE
+========================================================= */
+
+async function createHandLandmarker(){
+
+    statusText.textContent =
+        "loading hand tracking...";
 
     const vision =
         await FilesetResolver.forVisionTasks(
             "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm"
         );
 
+    let tracker;
+
+    try{
+
+        tracker =
+            await HandLandmarker.createFromOptions(
+                vision,
+                {
+
+                    baseOptions:{
+
+                        modelAssetPath:
+                            "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+
+                        delegate:
+                            "GPU"
+
+                    },
+
+                    runningMode:
+                        "VIDEO",
+
+                    numHands:
+                        2,
+
+                    minHandDetectionConfidence:
+                        0.5,
+
+                    minHandPresenceConfidence:
+                        0.5,
+
+                    minTrackingConfidence:
+                        0.5
+
+                }
+            );
+
+    }catch(gpuError){
+
+        console.warn(
+            "GPU hand tracking failed. Falling back to CPU.",
+            gpuError
+        );
+
+        tracker =
+            await HandLandmarker.createFromOptions(
+                vision,
+                {
+
+                    baseOptions:{
+
+                        modelAssetPath:
+                            "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+
+                        delegate:
+                            "CPU"
+
+                    },
+
+                    runningMode:
+                        "VIDEO",
+
+                    numHands:
+                        2,
+
+                    minHandDetectionConfidence:
+                        0.5,
+
+                    minHandPresenceConfidence:
+                        0.5,
+
+                    minTrackingConfidence:
+                        0.5
+
+                }
+            );
+
+    }
 
     handLandmarker =
-        await HandLandmarker.createFromOptions(
-            vision,
-            {
+        tracker;
 
-                baseOptions: {
+    drawingUtils =
+        new DrawingUtils(ctx);
 
-                    modelAssetPath:
-                        "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
+    statusText.textContent =
+        "hand tracking ready";
 
-                },
-
-                runningMode: "VIDEO",
-
-                numHands: 2,
-
-                minHandDetectionConfidence: 0.5,
-
-                minHandPresenceConfidence: 0.5,
-
-                minTrackingConfidence: 0.5
-
-            }
-        );
+    return true;
 
 }
 
 
-/*
-==========================================================
+/* =========================================================
+   WAIT FOR VIDEO
+========================================================= */
+
+function waitForVideo(){
+
+    return new Promise(
+        (resolve,reject) => {
+
+            const timeout =
+                setTimeout(
+                    () => {
+
+                        reject(
+                            new Error(
+                                "Camera opened, but no video frames were received."
+                            )
+                        );
+
+                    },
+                    8000
+                );
+
+            function check(){
+
+                if(
+                    video.readyState >=
+                    HTMLMediaElement.HAVE_CURRENT_DATA &&
+                    video.videoWidth > 0 &&
+                    video.videoHeight > 0
+                ){
+
+                    clearTimeout(
+                        timeout
+                    );
+
+                    resolve();
+
+                    return;
+
+                }
+
+                requestAnimationFrame(
+                    check
+                );
+
+            }
+
+            check();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   STOP CAMERA
+========================================================= */
+
+function stopCamera(){
+
+    webcamRunning =
+        false;
+
+    trackingRunning =
+        false;
+
+    if(webcamStream){
+
+        webcamStream
+            .getTracks()
+            .forEach(
+                track => {
+
+                    track.stop();
+
+                }
+            );
+
+        webcamStream =
+            null;
+
+    }
+
+    if(video.srcObject){
+
+        const tracks =
+            video.srcObject
+                .getTracks();
+
+        tracks.forEach(
+            track =>
+                track.stop()
+        );
+
+        video.srcObject =
+            null;
+
+    }
+
+    releaseAllAudio();
+
+    statusDot.classList.remove(
+        "live"
+    );
+
+    statusText.textContent =
+        "camera offline";
+
+    handCount.textContent =
+        "0 hands";
+
+    lastLeftSeen =
+        0;
+
+    lastRightSeen =
+        0;
+
+    /* RESET DISPLAYED NAMES */
+
+    leftNote.textContent =
+        "—";
+
+    rightChord.textContent =
+        "—";
+
+    highlightLeft(-1);
+
+    highlightRight(-1);
+
+}
+
+
+/* =========================================================
+   CAMERA ERROR HANDLER
+========================================================= */
+
+function handleCameraError(error){
+
+    console.error(
+        "MAXMOTION camera error:",
+        error
+    );
+
+    webcamRunning =
+        false;
+
+    trackingRunning =
+        false;
+
+    releaseAllAudio();
+
+    statusDot.classList.remove(
+        "live"
+    );
+
+    statusText.textContent =
+        "camera unavailable";
+
+    startButton.disabled =
+        false;
+
+    startButton.textContent =
+        "try again";
+
+    let message =
+        "MAXMOTION could not access your camera.";
+
+    if(
+        error.name ===
+        "NotAllowedError"
+    ){
+
+        message =
+            "Camera permission was denied. Allow camera access for this site in your browser settings, then click TRY AGAIN.";
+
+    }
+
+    else if(
+        error.name ===
+        "NotFoundError"
+    ){
+
+        message =
+            "No camera was found. Make sure your webcam is connected and available.";
+
+    }
+
+    else if(
+        error.name ===
+        "NotReadableError"
+    ){
+
+        message =
+            "Your camera is already being used by another application. Close Zoom, Teams, Discord, another browser tab, or another camera app.";
+
+    }
+
+    else if(
+        error.name ===
+        "OverconstrainedError"
+    ){
+
+        message =
+            "The requested camera settings are not supported. MAXMOTION will try a simpler camera mode.";
+
+    }
+
+    else if(
+        error.name ===
+        "SecurityError"
+    ){
+
+        message =
+            "The browser blocked camera access. Open MAXMOTION through localhost or HTTPS instead of file://.";
+
+    }
+
+    else if(
+        error.message &&
+        error.message.includes(
+            "localhost"
+        )
+    ){
+
+        message =
+            error.message;
+
+    }
+
+    else if(
+        !window.isSecureContext
+    ){
+
+        message =
+            "Camera access requires a secure context. Run MAXMOTION through localhost or HTTPS.";
+
+    }
+
+    else if(error.message){
+
+        message =
+            error.message;
+
+    }
+
+    showCameraError(
+        message
+    );
+
+}
+
+
+/* =========================================================
+   START CAMERA
+========================================================= */
+
+async function enableCamera(){
+
+    clearCameraError();
+
+    statusText.textContent =
+        "checking camera...";
+
+    startButton.disabled =
+        true;
+
+    startButton.textContent =
+        "starting...";
+
+    try{
+
+        if(
+            window.location.protocol ===
+            "file:"
+        ){
+
+            throw new Error(
+                "Camera access is blocked when MAXMOTION is opened directly as a file. Run it through localhost or HTTPS."
+            );
+
+        }
+
+        if(
+            !window.isSecureContext
+        ){
+
+            throw new Error(
+                "Camera access requires localhost or HTTPS. Please run MAXMOTION through a local server."
+            );
+
+        }
+
+        if(
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ){
+
+            throw new Error(
+                "Your browser does not provide camera access. Try the latest Chrome or Edge."
+            );
+
+        }
+
+        stopCamera();
+
+        statusText.textContent =
+            "requesting camera...";
+
+        try{
+
+            webcamStream =
+                await navigator.mediaDevices
+                    .getUserMedia({
+
+                        video:{
+
+                            facingMode:{
+                                ideal:"user"
+                            },
+
+                            width:{
+                                ideal:1280
+                            },
+
+                            height:{
+                                ideal:720
+                            },
+
+                            frameRate:{
+                                ideal:30
+                            }
+
+                        },
+
+                        audio:false
+
+                    });
+
+        }catch(firstError){
+
+            console.warn(
+                "Primary camera request failed. Trying fallback.",
+                firstError
+            );
+
+            webcamStream =
+                await navigator.mediaDevices
+                    .getUserMedia({
+
+                        video:true,
+
+                        audio:false
+
+                    });
+
+        }
+
+        video.autoplay =
+            true;
+
+        video.muted =
+            true;
+
+        video.playsInline =
+            true;
+
+        video.srcObject =
+            webcamStream;
+
+        await new Promise(
+            resolve => {
+
+                if(
+                    video.readyState >=
+                    HTMLMediaElement.HAVE_METADATA
+                ){
+
+                    resolve();
+
+                    return;
+
+                }
+
+                video.addEventListener(
+                    "loadedmetadata",
+                    resolve,
+                    {
+                        once:true
+                    }
+                );
+
+            }
+        );
+
+        await video.play();
+
+        await waitForVideo();
+
+        canvas.width =
+            video.videoWidth;
+
+        canvas.height =
+            video.videoHeight;
+
+        webcamRunning =
+            true;
+
+        startOverlay.style.display =
+            "none";
+
+        statusDot.classList.add(
+            "live"
+        );
+
+        statusText.textContent =
+            "camera online";
+
+        await startAudio();
+
+        if(!handLandmarker){
+
+            try{
+
+                await createHandLandmarker();
+
+            }catch(modelError){
+
+                console.error(
+                    "MediaPipe failed:",
+                    modelError
+                );
+
+                statusText.textContent =
+                    "camera online / tracking failed";
+
+                showCameraError(
+                    "The camera is working, but hand tracking could not load. Check your internet connection and reload MAXMOTION."
+                );
+
+                startButton.disabled =
+                    false;
+
+                startButton.textContent =
+                    "camera running";
+
+                return;
+
+            }
+
+        }
+
+        trackingRunning =
+            true;
+
+        lastVideoTime =
+            -1;
+
+        startButton.textContent =
+            "running";
+
+        trackingLoop();
+
+    }catch(error){
+
+        handleCameraError(
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
    PROCESS HANDS
-==========================================================
-*/
+========================================================= */
 
-function processHands(results) {
+function processHands(results){
 
-    canvas.width =
-        video.videoWidth;
+    if(
+        !video.videoWidth ||
+        !video.videoHeight
+    ){
 
-    canvas.height =
-        video.videoHeight;
+        return;
 
+    }
+
+    if(
+        canvas.width !==
+        video.videoWidth
+    ){
+
+        canvas.width =
+            video.videoWidth;
+
+    }
+
+    if(
+        canvas.height !==
+        video.videoHeight
+    ){
+
+        canvas.height =
+            video.videoHeight;
+
+    }
 
     ctx.clearRect(
         0,
@@ -1724,31 +4374,50 @@ function processHands(results) {
         canvas.height
     );
 
+    let foundLeft =
+        false;
 
-    let foundLeft = false;
+    let foundRight =
+        false;
 
-    let foundRight = false;
+    let detectedHands =
+        0;
 
 
-    if (
+    /* =====================================================
+       PROCESS DETECTED HANDS
+    ====================================================== */
+
+    if(
+        results &&
         results.landmarks &&
         results.landmarks.length
-    ) {
+    ){
 
-        const drawingUtils =
-            new DrawingUtils(ctx);
-
+        detectedHands =
+            results.landmarks.length;
 
         results.landmarks.forEach(
-            (landmarks, index) => {
-
+            (
+                landmarks,
+                index
+            ) => {
 
                 const handedness =
-                    results.handedness[
+                    results.handedness?.[
                         index
-                    ][0]
-                    .categoryName;
+                    ]?.[0]?.categoryName;
 
+                if(!handedness){
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   COUNT FINGERS
+                ================================================== */
 
                 const fingers =
                     countFingers(
@@ -1757,41 +4426,46 @@ function processHands(results) {
                     );
 
 
-                /*
-                   Draw hand skeleton
-                */
+                /* =================================================
+                   DRAW HAND
+                ================================================== */
 
-                drawingUtils.drawConnectors(
-                    landmarks,
+                if(drawingUtils){
 
-                    HandLandmarker.HAND_CONNECTIONS,
+                    drawingUtils.drawConnectors(
+                        landmarks,
+                        HandLandmarker.HAND_CONNECTIONS,
+                        {
+                            color:"#ff174f",
+                            lineWidth:3
+                        }
+                    );
 
-                    {
-                        color: "#FFFFFF",
-                        lineWidth: 3
-                    }
-                );
+                    drawingUtils.drawLandmarks(
+                        landmarks,
+                        {
+                            color:"#ffffff",
+                            radius:4
+                        }
+                    );
+
+                }
 
 
-                drawingUtils.drawLandmarks(
-                    landmarks,
+                /* =================================================
+                   LEFT HAND = MELODY
+                ================================================== */
 
-                    {
-                        color: "#FFFFFF",
-                        radius: 4
-                    }
-                );
+                if(
+                    handedness ===
+                    "Left"
+                ){
 
+                    foundLeft =
+                        true;
 
-                /*
-                   LEFT HAND
-                */
-
-                if (
-                    handedness === "Left"
-                ) {
-
-                    foundLeft = true;
+                    lastLeftSeen =
+                        performance.now();
 
 
                     const note =
@@ -1800,52 +4474,88 @@ function processHands(results) {
                         ];
 
 
-                    leftNote.textContent =
-                        note
-                            ? note.replace(
-                                "4",
-                                ""
-                              ).replace(
-                                "5",
-                                ""
-                              )
-                            : "—";
+                    if(note){
+
+                        /*
+                           THIS IS THE IMPORTANT NEW LOGIC.
+
+                           Convert C4 -> C
+                           Convert D4 -> D
+                           etc.
+                        */
+
+                        const noteName =
+                            note
+                                .replace("4","")
+                                .replace("5","");
 
 
-                    if (note) {
+                        /*
+                           SHOW THE ACTUAL NOTE
+                           ON THE CAMERA.
+                        */
 
-                        highlight(
-                            0,
+                        leftNote.textContent =
+                            noteName;
+
+
+                        /*
+                           Highlight corresponding
+                           melody key.
+
+                           1 finger -> index 0
+                           2 fingers -> index 1
+                           etc.
+                        */
+
+                        highlightLeft(
                             fingers - 1
                         );
 
 
-                        if (
-                            fingers !==
-                            previousLeft
-                        ) {
+                        /*
+                           Play / sustain note.
+                        */
 
-                            playMelody(note);
+                        playMelodySustained(
+                            fingers
+                        );
 
-                            previousLeft =
-                                fingers;
+                    }else{
 
-                        }
+                        /*
+                           0 fingers isn't a melody
+                           gesture, so reset.
+                        */
+
+                        leftNote.textContent =
+                            "—";
+
+                        highlightLeft(
+                            -1
+                        );
+
+                        stopMelody();
 
                     }
 
                 }
 
 
-                /*
-                   RIGHT HAND
-                */
+                /* =================================================
+                   RIGHT HAND = CHORD
+                ================================================== */
 
-                if (
-                    handedness === "Right"
-                ) {
+                if(
+                    handedness ===
+                    "Right"
+                ){
 
-                    foundRight = true;
+                    foundRight =
+                        true;
+
+                    lastRightSeen =
+                        performance.now();
 
 
                     const chord =
@@ -1854,23 +4564,55 @@ function processHands(results) {
                         ];
 
 
-                    rightChord.textContent =
-                        chord
-                            ? chord.name
-                            : "—";
+                    if(chord){
+
+                        /*
+                           SHOW THE ACTUAL CHORD NAME.
+
+                           0 -> Am
+                           1 -> C
+                           2 -> Dm
+                           3 -> Em
+                           4 -> F
+                           5 -> G
+                        */
+
+                        rightChord.textContent =
+                            chord.name;
 
 
-                    if (chord) {
+                        /*
+                           Right key order:
 
-                        highlight(
-                            1,
+                           index 0 = fist / Am
+                           index 1 = 1 / C
+                           index 2 = 2 / Dm
+                           etc.
+                        */
+
+                        highlightRight(
                             fingers
                         );
 
+
+                        /*
+                           Play / sustain chord.
+                        */
 
                         playChord(
                             fingers
                         );
+
+                    }else{
+
+                        rightChord.textContent =
+                            "—";
+
+                        highlightRight(
+                            -1
+                        );
+
+                        stopChord();
 
                     }
 
@@ -1882,36 +4624,61 @@ function processHands(results) {
     }
 
 
-    /*
-       No left hand
-    */
+    /* =====================================================
+       HAND COUNT
+    ====================================================== */
 
-    if (!foundLeft) {
+    handCount.textContent =
+        detectedHands +
+        (
+            detectedHands === 1
+                ? " hand"
+                : " hands"
+        );
 
-        leftNote.textContent = "—";
 
-        previousLeft = null;
+    const now =
+        performance.now();
 
-        highlight(
-            0,
+
+    /* =====================================================
+       LEFT HAND GONE
+    ====================================================== */
+
+    if(
+        !foundLeft &&
+        now - lastLeftSeen >
+        HAND_GRACE_TIME
+    ){
+
+        stopMelody();
+
+        leftNote.textContent =
+            "—";
+
+        highlightLeft(
             -1
         );
 
     }
 
 
-    /*
-       No right hand
-    */
+    /* =====================================================
+       RIGHT HAND GONE
+    ====================================================== */
 
-    if (!foundRight) {
+    if(
+        !foundRight &&
+        now - lastRightSeen >
+        HAND_GRACE_TIME
+    ){
 
-        rightChord.textContent = "—";
+        stopChord();
 
-        releaseChord();
+        rightChord.textContent =
+            "—";
 
-        highlight(
-            1,
+        highlightRight(
             -1
         );
 
@@ -1920,38 +4687,53 @@ function processHands(results) {
 }
 
 
-/*
-==========================================================
+/* =========================================================
    TRACKING LOOP
-==========================================================
-*/
+========================================================= */
 
-function trackingLoop() {
+function trackingLoop(){
 
-    if (!running) return;
+    if(
+        !trackingRunning ||
+        !webcamRunning
+    ){
 
-
-    if (
-        video.readyState >= 2 &&
-        video.currentTime !==
-        lastVideoTime
-    ) {
-
-        const results =
-            handLandmarker.detectForVideo(
-                video,
-                performance.now()
-            );
-
-
-        processHands(results);
-
-
-        lastVideoTime =
-            video.currentTime;
+        return;
 
     }
 
+    if(
+        video.readyState >=
+        HTMLMediaElement.HAVE_CURRENT_DATA &&
+        video.currentTime !==
+        lastVideoTime
+    ){
+
+        try{
+
+            const results =
+                handLandmarker.detectForVideo(
+                    video,
+                    performance.now()
+                );
+
+            processHands(
+                results
+            );
+
+            lastVideoTime =
+                video.currentTime;
+
+        }catch(error){
+
+            console.error(
+                "Hand tracking error:",
+                error
+            );
+
+        }
+
+    }
 
     requestAnimationFrame(
         trackingLoop
@@ -1960,187 +4742,337 @@ function trackingLoop() {
 }
 
 
-/*
-==========================================================
-   START CAMERA
-==========================================================
-*/
-
-async function startExperience() {
-
-    try {
-
-        startButton.disabled = true;
-
-        startButton.textContent =
-            "STARTING...";
-
-
-        /*
-           Camera
-        */
-
-        const stream =
-            await navigator.mediaDevices
-                .getUserMedia({
-
-                    video: {
-                        width: 1280,
-                        height: 720
-                    },
-
-                    audio: false
-
-                });
-
-
-        video.srcObject = stream;
-
-
-        await video.play();
-
-
-        /*
-           Audio
-        */
-
-        startAudio();
-
-        await audioContext.resume();
-
-
-        /*
-           AI
-        */
-
-        await setupHands();
-
-
-        /*
-           Start
-        */
-
-        running = true;
-
-
-        liveText.textContent =
-            "LIVE";
-
-
-        liveDot.style.background =
-            "#fff";
-
-
-        startButton.textContent =
-            "RUNNING";
-
-
-        trackingLoop();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        liveText.textContent =
-            "ERROR";
-
-
-        startButton.disabled =
-            false;
-
-
-        startButton.textContent =
-            "TRY AGAIN";
-
-
-        alert(
-            "Something went wrong. Open the browser console (F12) to see the error."
-        );
-
-    }
-
-}
-
-
-/*
-==========================================================
+/* =========================================================
    PAGE NAVIGATION
-==========================================================
-*/
+========================================================= */
 
-function openSynth() {
+function openSynth(){
 
-    home.style.display = "none";
+    homePage.style.display =
+        "none";
 
-    synth.style.display = "block";
+    synthPage.style.display =
+        "block";
 
-    window.scrollTo(0, 0);
-
-}
-
-
-enterButton.addEventListener(
-    "click",
-    openSynth
-);
-
-
-finalButton.addEventListener(
-    "click",
-    openSynth
-);
-
-
-document
-    .querySelector(".nav-play")
-    .addEventListener(
-        "click",
-        openSynth
+    window.scrollTo(
+        0,
+        0
     );
 
+}
+
+
+/* =========================================================
+   OPEN / CLOSE LINKS
+========================================================= */
+
+document
+    .querySelectorAll(
+        "[data-page]"
+    )
+    .forEach(
+        element => {
+
+            element.addEventListener(
+                "click",
+                event => {
+
+                    const page =
+                        element.dataset.page;
+
+                    if(
+                        page ===
+                        "synth"
+                    ){
+
+                        event.preventDefault();
+
+                        openSynth();
+
+                    }
+
+                    if(
+                        page ===
+                        "home"
+                    ){
+
+                        event.preventDefault();
+
+                        stopCamera();
+
+                        synthPage.style.display =
+                            "none";
+
+                        homePage.style.display =
+                            "block";
+
+                        window.scrollTo(
+                            0,
+                            0
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
 
 backButton.addEventListener(
     "click",
     () => {
 
-        running = false;
+        stopCamera();
 
-        releaseChord();
-
-
-        if (video.srcObject) {
-
-            video.srcObject
-                .getTracks()
-                .forEach(
-                    track =>
-                        track.stop()
-                );
-
-        }
-
-
-        synth.style.display =
+        synthPage.style.display =
             "none";
 
-        home.style.display =
+        homePage.style.display =
             "block";
 
-        window.scrollTo(0, 0);
+        window.scrollTo(
+            0,
+            0
+        );
 
     }
 );
 
 
+/* =========================================================
+   START BUTTON
+========================================================= */
+
 startButton.addEventListener(
     "click",
-    startExperience
+    enableCamera
 );
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        stopCamera();
+
+    }
+);
+
+</script>
+
+
+<!-- =======================================================
+     DREAMY INTERACTION
+======================================================= -->
+
+<script>
+
+(function(){
+
+    /* =====================================================
+       CURSOR
+    ===================================================== */
+
+    const dot =
+        document.querySelector(
+            ".cursor-dot"
+        );
+
+    const ring =
+        document.querySelector(
+            ".cursor-ring"
+        );
+
+
+    let mouseX =
+        window.innerWidth / 2;
+
+    let mouseY =
+        window.innerHeight / 2;
+
+    let ringX =
+        mouseX;
+
+    let ringY =
+        mouseY;
+
+
+    window.addEventListener(
+        "mousemove",
+        event => {
+
+            mouseX =
+                event.clientX;
+
+            mouseY =
+                event.clientY;
+
+
+            if(dot){
+
+                dot.style.left =
+                    mouseX + "px";
+
+                dot.style.top =
+                    mouseY + "px";
+
+            }
+
+        }
+    );
+
+
+    function followCursor(){
+
+        ringX +=
+            (
+                mouseX -
+                ringX
+            ) * .13;
+
+
+        ringY +=
+            (
+                mouseY -
+                ringY
+            ) * .13;
+
+
+        if(ring){
+
+            ring.style.left =
+                ringX + "px";
+
+            ring.style.top =
+                ringY + "px";
+
+        }
+
+
+        requestAnimationFrame(
+            followCursor
+        );
+
+    }
+
+
+    followCursor();
+
+
+    /* =====================================================
+       HOVER
+    ===================================================== */
+
+    document
+        .querySelectorAll(
+            "a,button,.theme-btn,.key"
+        )
+        .forEach(
+            element => {
+
+                element.addEventListener(
+                    "mouseenter",
+                    () => {
+
+                        document.body
+                            .classList
+                            .add(
+                                "hovering"
+                            );
+
+                    }
+                );
+
+
+                element.addEventListener(
+                    "mouseleave",
+                    () => {
+
+                        document.body
+                            .classList
+                            .remove(
+                                "hovering"
+                            );
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* =====================================================
+       DREAM BALL
+    ===================================================== */
+
+    document
+        .querySelectorAll(
+            ".dream-ball,.floating-note"
+        )
+        .forEach(
+            element => {
+
+                element.addEventListener(
+                    "mousemove",
+                    event => {
+
+                        const rect =
+                            element
+                                .getBoundingClientRect();
+
+
+                        const x =
+                            (
+                                event.clientX -
+                                rect.left
+                            ) /
+                            rect.width -
+                            .5;
+
+
+                        const y =
+                            (
+                                event.clientY -
+                                rect.top
+                            ) /
+                            rect.height -
+                            .5;
+
+
+                        element.style.transform =
+                            `translate(${x * 10}px,${y * 10}px) rotate(${x * 4}deg)`;
+
+                    }
+                );
+
+
+                element.addEventListener(
+                    "mouseleave",
+                    () => {
+
+                        element.style.transform =
+                            "";
+
+                    }
+                );
+
+            }
+        );
+
+
+})();
 
 </script>
 
 </body>
 </html>
-```
